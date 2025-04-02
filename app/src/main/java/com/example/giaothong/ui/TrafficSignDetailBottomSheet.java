@@ -96,7 +96,7 @@ public class TrafficSignDetailBottomSheet extends BottomSheetDialogFragment {
         TextView textDescription = view.findViewById(R.id.textSignDescription);
         
         // Gán dữ liệu
-        textCategory.setText(trafficSign.getCategory());
+        textCategory.setText(getCategoryDisplayName(trafficSign.getCategory()));
         //textId.setText(trafficSign.getId());
         textName.setText(trafficSign.getName());
         textDescription.setText(trafficSign.getDescription());
@@ -143,16 +143,40 @@ public class TrafficSignDetailBottomSheet extends BottomSheetDialogFragment {
             return 0;
         }
         
-        if (category.equals("Biển báo cấm")) {
-            return ContextCompat.getColor(getContext(), R.color.colorProhibitory);
-        } else if (category.equals("Biển báo nguy hiểm")) {
-            return ContextCompat.getColor(getContext(), R.color.colorWarning);
-        } else if (category.equals("Biển báo hiệu lệnh")) {
-            return ContextCompat.getColor(getContext(), R.color.colorMandatory);
-        } else if (category.equals("Biển báo chỉ dẫn")) {
-            return ContextCompat.getColor(getContext(), R.color.colorGuide);
+        if (category.equals("bien_bao_cam")) {
+            return ContextCompat.getColor(getContext(), R.color.colorCam);
+        } else if (category.equals("bien_nguy_hiem_va_canh_bao")) {
+            return ContextCompat.getColor(getContext(), R.color.colorNguyHiem);
+        } else if (category.equals("bien_hieu_lenh")) {
+            return ContextCompat.getColor(getContext(), R.color.colorHieuLenh);
+        } else if (category.equals("bien_chi_dan")) {
+            return ContextCompat.getColor(getContext(), R.color.colorChiDan);
+        } else if (category.equals("bien_phu")) {
+            return ContextCompat.getColor(getContext(), R.color.colorPhu);
         } else {
             return ContextCompat.getColor(getContext(), R.color.colorTextSecondary);
+        }
+    }
+
+    /**
+     * Chuyển đổi mã danh mục sang tên hiển thị thân thiện với người dùng
+     * @param categoryCode Mã danh mục
+     * @return Tên hiển thị của danh mục
+     */
+    private String getCategoryDisplayName(String categoryCode) {
+        switch (categoryCode) {
+            case "bien_bao_cam":
+                return "Biển báo cấm";
+            case "bien_nguy_hiem_va_canh_bao":
+                return "Biển nguy hiểm và cảnh báo";
+            case "bien_hieu_lenh":
+                return "Biển hiệu lệnh";
+            case "bien_chi_dan":
+                return "Biển chỉ dẫn";
+            case "bien_phu":
+                return "Biển phụ";
+            default:
+                return categoryCode;
         }
     }
 } 

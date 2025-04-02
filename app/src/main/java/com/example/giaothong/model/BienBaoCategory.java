@@ -13,19 +13,19 @@ public class BienBaoCategory {
     @SerializedName("_id")
     private String id;
     
-    @SerializedName("Biển báo cấm")
+    @SerializedName("bien_bao_cam")
     private List<BienBaoItem> bienBaoCam;
     
-    @SerializedName("Biển báo nguy hiểm và cảnh báo")
+    @SerializedName("bien_nguy_hiem_va_canh_bao")
     private List<BienBaoItem> bienBaoNguyHiem;
     
-    @SerializedName("Biển hiệu lệnh")
+    @SerializedName("bien_hieu_lenh")
     private List<BienBaoItem> bienBaoHieuLenh;
     
-    @SerializedName("Biển chỉ dẫn")
+    @SerializedName("bien_chi_dan")
     private List<BienBaoItem> bienBaoChiDan;
     
-    @SerializedName("Biển phụ")
+    @SerializedName("bien_phu")
     private List<BienBaoItem> bienBaoPhu;
 
     public String getId() {

@@ -46,7 +46,7 @@ public class TrafficSignRepository {
                         if (category.getBienBaoCam() != null) {
                             int index = 0;
                             for (BienBaoItem item : category.getBienBaoCam()) {
-                                allSigns.add(item.toTrafficSign("Biển báo cấm", index++));
+                                allSigns.add(item.toTrafficSign("bien_bao_cam", index++));
                             }
                         }
                         
@@ -54,7 +54,7 @@ public class TrafficSignRepository {
                         if (category.getBienBaoNguyHiem() != null) {
                             int index = 0;
                             for (BienBaoItem item : category.getBienBaoNguyHiem()) {
-                                allSigns.add(item.toTrafficSign("Biển báo nguy hiểm và cảnh báo", index++));
+                                allSigns.add(item.toTrafficSign("bien_nguy_hiem_va_canh_bao", index++));
                             }
                         }
                         
@@ -62,7 +62,7 @@ public class TrafficSignRepository {
                         if (category.getBienBaoHieuLenh() != null) {
                             int index = 0;
                             for (BienBaoItem item : category.getBienBaoHieuLenh()) {
-                                allSigns.add(item.toTrafficSign("Biển hiệu lệnh", index++));
+                                allSigns.add(item.toTrafficSign("bien_hieu_lenh", index++));
                             }
                         }
                         
@@ -70,7 +70,7 @@ public class TrafficSignRepository {
                         if (category.getBienBaoChiDan() != null) {
                             int index = 0;
                             for (BienBaoItem item : category.getBienBaoChiDan()) {
-                                allSigns.add(item.toTrafficSign("Biển chỉ dẫn", index++));
+                                allSigns.add(item.toTrafficSign("bien_chi_dan", index++));
                             }
                         }
                         
@@ -78,7 +78,7 @@ public class TrafficSignRepository {
                         if (category.getBienBaoPhu() != null) {
                             int index = 0;
                             for (BienBaoItem item : category.getBienBaoPhu()) {
-                                allSigns.add(item.toTrafficSign("Biển phụ", index++));
+                                allSigns.add(item.toTrafficSign("bien_phu", index++));
                             }
                         }
                     }

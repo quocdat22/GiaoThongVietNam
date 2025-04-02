@@ -144,15 +144,15 @@ public class MainActivity extends AppCompatActivity {
             if (checkedId == R.id.chipAll) {
                 category = "";
             } else if (checkedId == R.id.chipCam) {
-                category = "Biển báo cấm";
+                category = "bien_bao_cam";
             } else if (checkedId == R.id.chipNguyHiem) {
-                category = "Biển báo nguy hiểm và cảnh báo";
+                category = "bien_nguy_hiem_va_canh_bao";
             } else if (checkedId == R.id.chipHieuLenh) {
-                category = "Biển hiệu lệnh";
+                category = "bien_hieu_lenh";
             } else if (checkedId == R.id.chipChiDan) {
-                category = "Biển chỉ dẫn";
+                category = "bien_chi_dan";
             } else if (checkedId == R.id.chipPhu) {
-                category = "Biển phụ";
+                category = "bien_phu";
             }
             
             // Cập nhật bộ lọc
