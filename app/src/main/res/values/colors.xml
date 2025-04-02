@@ -7,4 +7,22 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="colorPrimary">#2196F3</color>
+    <color name="colorPrimaryDark">#1976D2</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorText">#212121</color>
+    <color name="colorTextSecondary">#757575</color>
+    <color name="colorDivider">#BDBDBD</color>
+    <color name="colorProhibitory">#D32F2F</color>
+    <color name="colorWarning">#FFC107</color>
+    <color name="colorMandatory">#2196F3</color>
+    <color name="colorGuide">#4CAF50</color>
+    
+    <!-- Màu sắc cho các loại biển báo mới -->
+    <color name="colorCam">#D32F2F</color>
+    <color name="colorNguyHiem">#FFC107</color>
+    <color name="colorHieuLenh">#2196F3</color>
+    <color name="colorChiDan">#4CAF50</color>
+    <color name="colorPhu">#9C27B0</color>
 </resources>

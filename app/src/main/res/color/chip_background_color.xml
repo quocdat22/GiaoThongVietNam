@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/colorPrimary" android:state_checked="true" android:id="@+id/chipAll" />
+    <item android:color="@color/colorProhibitory" android:state_checked="true" android:id="@+id/chipProhibitory" />
+    <item android:color="@color/colorWarning" android:state_checked="true" android:id="@+id/chipWarning" />
+    <item android:color="@color/colorMandatory" android:state_checked="true" android:id="@+id/chipMandatory" />
+    <item android:color="@color/colorGuide" android:state_checked="true" android:id="@+id/chipGuide" />
+    <item android:color="@android:color/white" />
+</selector> 

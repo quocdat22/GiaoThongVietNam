@@ -19,17 +19,102 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewSigns"
+    <HorizontalScrollView
+        android:id="@+id/scrollViewCategories"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textTitle">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupCategories"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="true"
+            app:selectionRequired="false">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipAll"
+                style="@style/CategoryChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Tất cả" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipCam"
+                style="@style/CategoryChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Biển báo cấm" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipNguyHiem"
+                style="@style/CategoryChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Biển báo nguy hiểm và cảnh báo" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipHieuLenh"
+                style="@style/CategoryChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Biển hiệu lệnh" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipChiDan"
+                style="@style/CategoryChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Biển chỉ dẫn" />
+                
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipPhu"
+                style="@style/CategoryChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Biển phụ" />
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
+    <TextView
+        android:id="@+id/textEmptyState"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textColor="@color/colorTextSecondary"
+        android:text="Không tìm thấy biển báo nào"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scrollViewCategories" />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:clipToPadding="false"
-        android:padding="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textTitle"
-        tools:listitem="@layout/item_traffic_sign" />
+        app:layout_constraintTop_toBottomOf="@+id/scrollViewCategories">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewSigns"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="4dp"
+            tools:listitem="@layout/item_traffic_sign" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

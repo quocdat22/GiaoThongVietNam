@@ -80,21 +80,40 @@ public class TrafficSignAdapter extends RecyclerView.Adapter<TrafficSignAdapter.
         public void bind(TrafficSign trafficSign) {
             textName.setText(trafficSign.getName());
 
-            // Load image from assets folder using Glide
+            // Load image using Glide
             try {
-                // Convert path to assets format (file:///android_asset/)
-                String assetPath = "file:///android_asset/" + trafficSign.getImagePath();
+                String imageUrl = trafficSign.getImagePath();
                 
-                Glide.with(context)
-                    .load(assetPath)
-                    .apply(new RequestOptions()
-                            .centerInside()
-                            .override(300, 300))
-                    .placeholder(R.drawable.ic_launcher_foreground)
-                    .error(R.drawable.ic_launcher_foreground)
-                    .into(imageSign);
+                // Kiểm tra xem có phải URL không
+                if (imageUrl != null && !imageUrl.isEmpty()) {
+                    if (imageUrl.startsWith("http")) {
+                        // Tải hình ảnh từ URL
+                        Glide.with(context)
+                            .load(imageUrl)
+                            .apply(new RequestOptions()
+                                    .centerInside()
+                                    .override(300, 300))
+                            .placeholder(R.drawable.ic_launcher_foreground)
+                            .error(R.drawable.ic_launcher_foreground)
+                            .into(imageSign);
+                    } else {
+                        // Tải từ assets
+                        String assetPath = "file:///android_asset/" + imageUrl;
+                        Glide.with(context)
+                            .load(assetPath)
+                            .apply(new RequestOptions()
+                                    .centerInside()
+                                    .override(300, 300))
+                            .placeholder(R.drawable.ic_launcher_foreground)
+                            .error(R.drawable.ic_launcher_foreground)
+                            .into(imageSign);
+                    }
+                } else {
+                    // Nếu không có hình ảnh, hiển thị placeholder
+                    imageSign.setImageResource(R.drawable.ic_launcher_foreground);
+                }
             } catch (Exception e) {
-                // If image loading fails, show placeholder
+                // Nếu tải hình ảnh thất bại, hiển thị placeholder
                 imageSign.setImageResource(R.drawable.ic_launcher_foreground);
             }
         }

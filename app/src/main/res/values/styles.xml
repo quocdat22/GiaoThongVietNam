@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Style for the bottom sheet dialog -->
+    <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
+    </style>
+
+    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+    
+    <!-- Chip styles for category filters -->
+    <style name="CategoryChip" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="android:textSize">14sp</item>
+        <item name="chipBackgroundColor">@color/chip_background_color</item>
+        <item name="chipIconVisible">false</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="rippleColor">@color/colorPrimary</item>
+    </style>
+</resources> 
