@@ -1,10 +1,14 @@
 <resources>
-    <string name="app_name">Luật Giao Thông</string>
+    <string name="app_name">Giao Thông</string>
     <string name="title_traffic_signs">Biển Báo Giao Thông</string>
     <string name="title_traffic_law">Luật Giao Thông</string>
-    <string name="search_hint">Tìm kiếm...</string>
+    <string name="no_signs_found">Không tìm thấy biển báo nào</string>
+    <string name="search_hint">Tìm kiếm biển báo...</string>
+    <string name="refreshing_data">Đang làm mới dữ liệu...</string>
+    <string name="category_all">Tất cả</string>
     <string name="category_prohibitory">Biển báo cấm</string>
-    <string name="category_warning">Biển báo nguy hiểm</string>
-    <string name="category_mandatory">Biển báo hiệu lệnh</string>
-    <string name="category_guide">Biển báo chỉ dẫn</string>
+    <string name="category_warning">Biển nguy hiểm và cảnh báo</string>
+    <string name="category_mandatory">Biển hiệu lệnh</string>
+    <string name="category_guide">Biển chỉ dẫn</string>
+    <string name="category_auxiliary">Biển phụ</string>
 </resources>

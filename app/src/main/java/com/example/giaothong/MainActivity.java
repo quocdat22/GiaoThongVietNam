@@ -23,6 +23,13 @@ import com.example.giaothong.ui.TrafficSignDetailBottomSheet;
 import com.example.giaothong.viewmodel.TrafficSignViewModel;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import android.content.Context;
+import android.graphics.Rect;
+import android.widget.ImageView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,10 +55,44 @@ public class MainActivity extends AppCompatActivity {
         });
         
         // Initialize views
+        setupViews();
+        
+        // Initialize ViewModel - use the proper constructor for Java
+        viewModel = new ViewModelProvider(this).get(TrafficSignViewModel.class);
+        
+        // Set up adapter
+        adapter = new TrafficSignAdapter(this, new ArrayList<>());
+        adapter.setOnItemClickListener(this::showTrafficSignDetail);
+        recyclerView.setAdapter(adapter);
+        
+        // Observe traffic signs
+        viewModel.getTrafficSigns().observe(this, trafficSigns -> {
+            adapter.setTrafficSigns(trafficSigns);
+            // Stop refreshing animation if it was started
+            if (swipeRefreshLayout.isRefreshing()) {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+            
+            // Show/hide empty state if needed
+            if (trafficSigns.isEmpty()) {
+                textEmptyState.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
+            } else {
+                textEmptyState.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+    
+    private void setupViews() {
         recyclerView = findViewById(R.id.recyclerViewSigns);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         chipGroupCategories = findViewById(R.id.chipGroupCategories);
         textEmptyState = findViewById(R.id.textEmptyState);
+        SearchView searchView = findViewById(R.id.searchView);
+        
+        // Hiển thị thông báo trống phù hợp
+        textEmptyState.setText(R.string.no_signs_found);
         
         // Khởi tạo các chip lọc
         chipAll = findViewById(R.id.chipAll);
@@ -61,59 +102,58 @@ public class MainActivity extends AppCompatActivity {
         chipChiDan = findViewById(R.id.chipChiDan);
         chipPhu = findViewById(R.id.chipPhu);
         
-        // Set up chips với màu sắc tương ứng
+        // Thiết lập màu sắc cho các chip
         setupChips();
         
-        // Set up RecyclerView
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2)); // 2 columns
+        // Thiết lập bộ lọc danh mục
+        setupCategoryFilter();
         
-        // Set up SwipeRefreshLayout
+        // Thiết lập RecyclerView
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, 8, true));
+        
+        // Thiết lập SwipeRefreshLayout
         swipeRefreshLayout.setColorSchemeResources(
-                android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light
+                R.color.colorPrimary,
+                R.color.colorCam,
+                R.color.colorNguyHiem,
+                R.color.colorHieuLenh
         );
         
         swipeRefreshLayout.setOnRefreshListener(() -> {
-            // Khi người dùng vuốt để làm mới
-            if (viewModel != null) {
-                viewModel.refreshTrafficSigns();
-                Toast.makeText(MainActivity.this, "Đang làm mới dữ liệu...", Toast.LENGTH_SHORT).show();
+            viewModel.refreshTrafficSigns();
+            Toast.makeText(this, R.string.refreshing_data, Toast.LENGTH_SHORT).show();
+        });
+        
+        // Thiết lập SearchView
+        searchView.setQueryHint(getString(R.string.search_hint));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                viewModel.setSearchQuery(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                viewModel.setSearchQuery(newText);
+                return true;
             }
         });
         
-        // Initialize ViewModel - use the proper constructor for Java
-        viewModel = new ViewModelProvider(this).get(TrafficSignViewModel.class);
-        
-        // Observe traffic sign data
-        viewModel.getTrafficSigns().observe(this, trafficSigns -> {
-            // Create and set adapter when data is available
-            adapter = new TrafficSignAdapter(this, trafficSigns);
-            
-            // Set item click listener
-            adapter.setOnItemClickListener((trafficSign, position) -> {
-                // Hiển thị chi tiết biển báo trong bottom sheet
-                showTrafficSignDetails(trafficSign);
-            });
-            
-            recyclerView.setAdapter(adapter);
-            
-            // Cập nhật trạng thái UI
-            updateStatusUI(trafficSigns.size());
-            
-            // Dừng hiệu ứng làm mới nếu đang hoạt động
-            if (swipeRefreshLayout.isRefreshing()) {
-                swipeRefreshLayout.setRefreshing(false);
-            }
+        // Thiết lập nút xóa tìm kiếm
+        ImageView clearButton = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+        clearButton.setOnClickListener(v -> {
+            searchView.setQuery("", false);
+            searchView.clearFocus();
+            viewModel.setSearchQuery("");
         });
     }
     
     /**
-     * Thiết lập các chips lọc
+     * Thiết lập màu sắc cho các chip
      */
     private void setupChips() {
-        // Thiết lập màu sắc cho text khi được chọn
         chipAll.setCheckedIconVisible(true);
         
         chipCam.setCheckedIconVisible(true);
@@ -130,7 +170,12 @@ public class MainActivity extends AppCompatActivity {
         
         chipPhu.setCheckedIconVisible(true);
         chipPhu.setChipStrokeColorResource(R.color.colorPhu);
-        
+    }
+    
+    /**
+     * Thiết lập bộ lọc danh mục cho các chip
+     */
+    private void setupCategoryFilter() {
         // Xử lý sự kiện chọn chip
         chipGroupCategories.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == View.NO_ID) {
@@ -161,28 +206,48 @@ public class MainActivity extends AppCompatActivity {
     }
     
     /**
-     * Cập nhật trạng thái UI dựa trên số biển báo hiển thị
-     * @param signCount Số biển báo hiện đang hiển thị
+     * Hiển thị chi tiết biển báo trong bottom sheet
      */
-    private void updateStatusUI(int signCount) {
-        if (textEmptyState != null) {
-            if (signCount == 0) {
-                // Hiển thị trạng thái trống
-                textEmptyState.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
-            } else {
-                // Hiển thị danh sách
-                textEmptyState.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-            }
-        }
+    private void showTrafficSignDetail(TrafficSign trafficSign, int position) {
+        TrafficSignDetailBottomSheet bottomSheet = TrafficSignDetailBottomSheet.newInstance(trafficSign);
+        bottomSheet.show(getSupportFragmentManager(), "traffic_sign_detail");
     }
     
     /**
-     * Hiển thị chi tiết biển báo trong bottom sheet
+     * Lớp tạo khoảng cách giữa các item trong RecyclerView dạng Grid
      */
-    private void showTrafficSignDetails(TrafficSign trafficSign) {
-        TrafficSignDetailBottomSheet bottomSheet = TrafficSignDetailBottomSheet.newInstance(trafficSign);
-        bottomSheet.show(getSupportFragmentManager(), "traffic_sign_detail");
+    private class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
+        private final int spanCount;
+        private final int spacing;
+        private final boolean includeEdge;
+
+        public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
+            this.spanCount = spanCount;
+            this.spacing = spacing;
+            this.includeEdge = includeEdge;
+        }
+
+        @Override
+        public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, 
+                                   @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+            int position = parent.getChildAdapterPosition(view);
+            int column = position % spanCount;
+
+            if (includeEdge) {
+                outRect.left = spacing - column * spacing / spanCount;
+                outRect.right = (column + 1) * spacing / spanCount;
+
+                if (position < spanCount) {
+                    outRect.top = spacing;
+                }
+                outRect.bottom = spacing;
+            } else {
+                outRect.left = column * spacing / spanCount;
+                outRect.right = spacing - (column + 1) * spacing / spanCount;
+                if (position >= spanCount) {
+                    outRect.top = spacing;
+                }
+            }
+        }
     }
 }

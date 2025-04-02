@@ -10,6 +10,7 @@ import com.example.giaothong.repository.TrafficSignRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * ViewModel để quản lý dữ liệu biển báo
@@ -25,6 +26,9 @@ public class TrafficSignViewModel extends ViewModel {
     // Danh mục hiện tại được chọn để lọc
     private String currentCategory = "";
     
+    // Từ khóa tìm kiếm hiện tại
+    private String currentSearchQuery = "";
+    
     private final TrafficSignRepository repository;
     
     public TrafficSignViewModel() {
@@ -32,7 +36,7 @@ public class TrafficSignViewModel extends ViewModel {
         
         // Thêm source cho MediatorLiveData
         filteredTrafficSigns.addSource(originalTrafficSigns, trafficSigns -> {
-            applyFilter(currentCategory);
+            applyFilters(currentCategory, currentSearchQuery);
         });
         
         loadTrafficSigns();
@@ -69,30 +73,51 @@ public class TrafficSignViewModel extends ViewModel {
         }
         
         currentCategory = category;
-        applyFilter(currentCategory);
+        applyFilters(currentCategory, currentSearchQuery);
+    }
+    
+    /**
+     * Thiết lập từ khóa tìm kiếm
+     * @param query Từ khóa tìm kiếm, để trống để hiển thị tất cả
+     */
+    public void setSearchQuery(String query) {
+        if (query == null) {
+            query = "";
+        }
+        
+        currentSearchQuery = query.toLowerCase(Locale.getDefault());
+        applyFilters(currentCategory, currentSearchQuery);
     }
     
     /**
      * Áp dụng bộ lọc vào danh sách biển báo
      * @param category Danh mục cần lọc
+     * @param searchQuery Từ khóa tìm kiếm
      */
-    private void applyFilter(String category) {
+    private void applyFilters(String category, String searchQuery) {
         List<TrafficSign> allSigns = originalTrafficSigns.getValue();
         
         if (allSigns == null) {
             return;
         }
         
-        // Nếu không có danh mục, hiển thị tất cả
-        if (category.isEmpty()) {
+        // Tạo danh sách kết quả
+        List<TrafficSign> filtered = new ArrayList<>();
+        
+        // Nếu không có điều kiện lọc, hiển thị tất cả
+        if (category.isEmpty() && searchQuery.isEmpty()) {
             filteredTrafficSigns.setValue(allSigns);
             return;
         }
         
-        // Lọc theo danh mục
-        List<TrafficSign> filtered = new ArrayList<>();
+        // Lọc dữ liệu
         for (TrafficSign sign : allSigns) {
-            if (sign.getCategory().equals(category)) {
+            boolean matchesCategory = category.isEmpty() || sign.getCategory().equals(category);
+            boolean matchesQuery = searchQuery.isEmpty() || 
+                                  sign.getName().toLowerCase(Locale.getDefault()).contains(searchQuery) ||
+                                  sign.getDescription().toLowerCase(Locale.getDefault()).contains(searchQuery);
+            
+            if (matchesCategory && matchesQuery) {
                 filtered.add(sign);
             }
         }

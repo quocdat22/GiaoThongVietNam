@@ -41,6 +41,16 @@ public class TrafficSignAdapter extends RecyclerView.Adapter<TrafficSignAdapter.
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }
+    
+    /**
+     * Cập nhật danh sách biển báo
+     * @param newTrafficSigns Danh sách biển báo mới
+     */
+    public void setTrafficSigns(List<TrafficSign> newTrafficSigns) {
+        this.trafficSigns.clear();
+        this.trafficSigns.addAll(newTrafficSigns);
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override
