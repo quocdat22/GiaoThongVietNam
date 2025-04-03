@@ -13,6 +13,7 @@ import com.example.giaothong.utils.DataUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -27,11 +28,12 @@ public class TrafficSignRepository {
     
     /**
      * Lấy danh sách biển báo từ API
-     * @param trafficSigns LiveData để cập nhật kết quả
+     * @param callback Callback được gọi khi dữ liệu sẵn sàng
      */
-    public void getTrafficSigns(MutableLiveData<List<TrafficSign>> trafficSigns) {
-        // Đầu tiên đặt dữ liệu mẫu để có thể hiển thị ngay
-        trafficSigns.setValue(DataUtils.getSampleTrafficSigns());
+    public void getTrafficSigns(Consumer<List<TrafficSign>> callback) {
+        // Đầu tiên tạo dữ liệu mẫu để có thể hiển thị ngay
+        List<TrafficSign> sampleData = DataUtils.getSampleTrafficSigns();
+        callback.accept(sampleData);
         
         // Sau đó gọi API để lấy dữ liệu thực
         ApiClient.getApiService().getTrafficSigns(ApiConfig.API_KEY).enqueue(new Callback<List<BienBaoCategory>>() {
@@ -83,11 +85,12 @@ public class TrafficSignRepository {
                         }
                     }
                     
-                    // Cập nhật LiveData với kết quả
+                    // Cập nhật callback với kết quả
                     if (!allSigns.isEmpty()) {
-                        trafficSigns.setValue(allSigns);
-                        Log.d(TAG, "Đã tải " + allSigns.size() + " biển báo từ API");
+                        callback.accept(allSigns);
                     }
+                    
+                    Log.d(TAG, "Đã tải " + allSigns.size() + " biển báo từ API");
                 } else {
                     Log.e(TAG, "Lỗi API: " + response.code() + " - " + response.message());
                 }
@@ -98,5 +101,13 @@ public class TrafficSignRepository {
                 Log.e(TAG, "Gọi API thất bại", t);
             }
         });
+    }
+    
+    /**
+     * Phương thức tương thích với cách gọi cũ, sẽ cập nhật trực tiếp LiveData
+     * @param trafficSigns LiveData để cập nhật kết quả
+     */
+    public void getTrafficSigns(MutableLiveData<List<TrafficSign>> trafficSigns) {
+        getTrafficSigns(trafficSigns::setValue);
     }
 } 

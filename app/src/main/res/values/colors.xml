@@ -13,7 +13,8 @@
     <color name="colorBackground">#FFFFFF</color>
     <color name="colorText">#212121</color>
     <color name="colorTextSecondary">#757575</color>
-    <color name="colorDivider">#BDBDBD</color>
+    <color name="colorTextPrimary">#212121</color>
+    <color name="colorDivider">#E0E0E0</color>
     <color name="colorProhibitory">#D32F2F</color>
     <color name="colorWarning">#FFC107</color>
     <color name="colorMandatory">#2196F3</color>
@@ -25,4 +26,8 @@
     <color name="colorHieuLenh">#2196F3</color>
     <color name="colorChiDan">#4CAF50</color>
     <color name="colorPhu">#9C27B0</color>
+    
+    <!-- Màu cho tính năng ghim -->
+    <color name="colorPinnedBackground">#FFEBEE</color>
+    <color name="colorPinIcon">#F44336</color>
 </resources>

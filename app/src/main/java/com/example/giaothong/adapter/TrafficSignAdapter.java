@@ -8,6 +8,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -24,13 +26,21 @@ public class TrafficSignAdapter extends RecyclerView.Adapter<TrafficSignAdapter.
 
     private final List<TrafficSign> trafficSigns;
     private final Context context;
-    private OnItemClickListener listener;
+    private OnItemClickListener clickListener;
+    private OnItemLongClickListener longClickListener;
 
     /**
      * Interface for click events on traffic sign items
      */
     public interface OnItemClickListener {
         void onItemClick(TrafficSign trafficSign, int position);
+    }
+    
+    /**
+     * Interface for long click events on traffic sign items
+     */
+    public interface OnItemLongClickListener {
+        boolean onItemLongClick(TrafficSign trafficSign, int position);
     }
 
     public TrafficSignAdapter(Context context, List<TrafficSign> trafficSigns) {
@@ -39,7 +49,11 @@ public class TrafficSignAdapter extends RecyclerView.Adapter<TrafficSignAdapter.
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
+        this.clickListener = listener;
+    }
+    
+    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
+        this.longClickListener = listener;
     }
     
     /**
@@ -70,61 +84,72 @@ public class TrafficSignAdapter extends RecyclerView.Adapter<TrafficSignAdapter.
         return trafficSigns.size();
     }
 
-    public class TrafficSignViewHolder extends RecyclerView.ViewHolder {
-        private final ImageView imageSign;
+    class TrafficSignViewHolder extends RecyclerView.ViewHolder {
+        private final ImageView imageView;
         private final TextView textName;
+        private final CardView cardView;
+        private final ImageView pinIndicator;
 
-        public TrafficSignViewHolder(@NonNull View itemView) {
+        TrafficSignViewHolder(@NonNull View itemView) {
             super(itemView);
-            imageSign = itemView.findViewById(R.id.image_traffic_sign);
+            imageView = itemView.findViewById(R.id.image_traffic_sign);
             textName = itemView.findViewById(R.id.text_sign_name);
-
+            cardView = itemView.findViewById(R.id.card_traffic_sign);
+            pinIndicator = itemView.findViewById(R.id.image_pin_indicator);
+            
+            // Set up click listeners
             itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION && listener != null) {
-                    listener.onItemClick(trafficSigns.get(position), position);
+                if (position != RecyclerView.NO_POSITION && clickListener != null) {
+                    clickListener.onItemClick(trafficSigns.get(position), position);
                 }
+            });
+            
+            itemView.setOnLongClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && longClickListener != null) {
+                    return longClickListener.onItemLongClick(trafficSigns.get(position), position);
+                }
+                return false;
             });
         }
 
-        public void bind(TrafficSign trafficSign) {
+        void bind(TrafficSign trafficSign) {
             textName.setText(trafficSign.getName());
-
-            // Load image using Glide
-            try {
-                String imageUrl = trafficSign.getImagePath();
-                
-                // Kiểm tra xem có phải URL không
-                if (imageUrl != null && !imageUrl.isEmpty()) {
-                    if (imageUrl.startsWith("http")) {
-                        // Tải hình ảnh từ URL
-                        Glide.with(context)
-                            .load(imageUrl)
+            
+            // Hiển thị trạng thái ghim
+            if (trafficSign.isPinned()) {
+                pinIndicator.setVisibility(View.VISIBLE);
+                cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.colorPinnedBackground));
+            } else {
+                pinIndicator.setVisibility(View.GONE);
+                cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white));
+            }
+            
+            // Tải hình ảnh
+            String imagePath = trafficSign.getImagePath();
+            if (imagePath != null && !imagePath.isEmpty()) {
+                if (imagePath.startsWith("http")) {
+                    // Load từ URL
+                    Glide.with(context)
+                            .load(imagePath)
                             .apply(new RequestOptions()
-                                    .centerInside()
-                                    .override(300, 300))
-                            .placeholder(R.drawable.ic_launcher_foreground)
-                            .error(R.drawable.ic_launcher_foreground)
-                            .into(imageSign);
-                    } else {
-                        // Tải từ assets
-                        String assetPath = "file:///android_asset/" + imageUrl;
-                        Glide.with(context)
+                                    .placeholder(R.drawable.ic_launcher_foreground)
+                                    .error(R.drawable.ic_launcher_foreground))
+                            .into(imageView);
+                } else {
+                    // Load từ assets
+                    String assetPath = "file:///android_asset/" + imagePath;
+                    Glide.with(context)
                             .load(assetPath)
                             .apply(new RequestOptions()
-                                    .centerInside()
-                                    .override(300, 300))
-                            .placeholder(R.drawable.ic_launcher_foreground)
-                            .error(R.drawable.ic_launcher_foreground)
-                            .into(imageSign);
-                    }
-                } else {
-                    // Nếu không có hình ảnh, hiển thị placeholder
-                    imageSign.setImageResource(R.drawable.ic_launcher_foreground);
+                                    .placeholder(R.drawable.ic_launcher_foreground)
+                                    .error(R.drawable.ic_launcher_foreground))
+                            .into(imageView);
                 }
-            } catch (Exception e) {
-                // Nếu tải hình ảnh thất bại, hiển thị placeholder
-                imageSign.setImageResource(R.drawable.ic_launcher_foreground);
+            } else {
+                // Hiển thị ảnh mặc định nếu không có ảnh
+                imageView.setImageResource(R.drawable.ic_launcher_foreground);
             }
         }
     }

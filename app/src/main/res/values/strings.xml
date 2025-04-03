@@ -6,9 +6,31 @@
     <string name="search_hint">Tìm kiếm biển báo...</string>
     <string name="refreshing_data">Đang làm mới dữ liệu...</string>
     <string name="category_all">Tất cả</string>
+    <string name="category_pinned">Đã ghim</string>
     <string name="category_prohibitory">Biển báo cấm</string>
     <string name="category_warning">Biển nguy hiểm và cảnh báo</string>
     <string name="category_mandatory">Biển hiệu lệnh</string>
     <string name="category_guide">Biển chỉ dẫn</string>
     <string name="category_auxiliary">Biển phụ</string>
+    
+    <!-- Strings for pin feature -->
+    <string name="show_pinned">Hiển thị đã ghim</string>
+    <string name="clear_pins">Xóa tất cả ghim</string>
+    <string name="sign_pinned">Đã ghim biển báo</string>
+    <string name="sign_unpinned">Đã bỏ ghim biển báo</string>
+    <string name="all_pins_cleared">Đã xóa tất cả ghim</string>
+    
+    <!-- Strings for search history feature -->
+    <string name="search_history">Lịch sử tìm kiếm</string>
+    <string name="clear_history">Xóa lịch sử</string>
+    <string name="no_search_history">Không có lịch sử tìm kiếm</string>
+    <string name="remove_from_history">Xóa khỏi lịch sử</string>
+    <string name="history_cleared">Đã xóa lịch sử tìm kiếm</string>
+    <string name="search_first_time_tip">Tìm kiếm để lưu vào lịch sử</string>
+    
+    <!-- Pin in detail view -->
+    <string name="pin_sign">Ghim biển báo</string>
+    <string name="unpin_sign">Bỏ ghim biển báo</string>
+    <string name="traffic_sign_image">Hình ảnh biển báo</string>
+    <string name="sign_id_format">ID: %s</string>
 </resources>
