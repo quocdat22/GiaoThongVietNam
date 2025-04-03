@@ -33,4 +33,10 @@
     <string name="unpin_sign">Bỏ ghim biển báo</string>
     <string name="traffic_sign_image">Hình ảnh biển báo</string>
     <string name="sign_id_format">ID: %s</string>
+    
+    <!-- New strings for dark mode feature -->
+    <string name="error_loading_data">Lỗi khi tải dữ liệu</string>
+    <string name="toggle_dark_mode">Chế độ tối</string>
+    <string name="dark_mode_on">Đã bật chế độ tối</string>
+    <string name="dark_mode_off">Đã tắt chế độ tối</string>
 </resources>

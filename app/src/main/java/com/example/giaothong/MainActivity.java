@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +15,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -28,6 +30,7 @@ import com.example.giaothong.ui.SearchHistoryPopup;
 import com.example.giaothong.ui.TrafficSignDetailBottomSheet;
 import com.example.giaothong.utils.SearchHistoryManager;
 import com.example.giaothong.utils.SharedPreferencesManager;
+import com.example.giaothong.utils.ThemeUtils;
 import com.example.giaothong.utils.Utils;
 import com.example.giaothong.viewmodel.TrafficSignViewModel;
 import com.google.android.material.chip.Chip;
@@ -49,9 +52,14 @@ public class MainActivity extends AppCompatActivity implements TrafficSignDetail
     private SearchView searchView;
     private SearchHistoryPopup searchHistoryPopup;
     private View cardSearch;
+    private MenuItem darkModeItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Áp dụng theme trước khi setContentView
+        prefsManager = new SharedPreferencesManager(this);
+        ThemeUtils.applyThemeFromPreferences(prefsManager);
+        
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
@@ -73,9 +81,6 @@ public class MainActivity extends AppCompatActivity implements TrafficSignDetail
             
             return insets;
         });
-        
-        // Khởi tạo SharedPreferencesManager
-        prefsManager = new SharedPreferencesManager(this);
         
         // Initialize views
         setupViews();
@@ -117,6 +122,13 @@ public class MainActivity extends AppCompatActivity implements TrafficSignDetail
         if (pinnedItem != null) {
             pinnedItem.setVisible(false);
         }
+        
+        // Thiết lập trạng thái ban đầu cho nút chuyển đổi chế độ tối
+        darkModeItem = menu.findItem(R.id.action_toggle_dark_mode);
+        if (darkModeItem != null) {
+            darkModeItem.setChecked(prefsManager.isDarkMode());
+        }
+        
         return true;
     }
     
@@ -148,6 +160,21 @@ public class MainActivity extends AppCompatActivity implements TrafficSignDetail
             
             Toast.makeText(this, R.string.history_cleared, Toast.LENGTH_SHORT).show();
             return true;
+        } else if (id == R.id.action_toggle_dark_mode) {
+            // Chuyển đổi chế độ tối/sáng
+            boolean isDarkMode = ThemeUtils.toggleDarkMode(this, prefsManager);
+            
+            // Cập nhật trạng thái menu item
+            item.setChecked(isDarkMode);
+            
+            // Hiển thị thông báo
+            Toast.makeText(
+                    this, 
+                    isDarkMode ? R.string.dark_mode_on : R.string.dark_mode_off,
+                    Toast.LENGTH_SHORT
+            ).show();
+            
+            return true;
         }
         
         return super.onOptionsItemSelected(item);
@@ -176,6 +203,13 @@ public class MainActivity extends AppCompatActivity implements TrafficSignDetail
         textEmptyState = findViewById(R.id.textEmptyState);
         cardSearch = findViewById(R.id.cardSearch);
         searchView = findViewById(R.id.searchView);
+        
+        // Set hint text color for SearchView
+        EditText searchEditText = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        if (searchEditText != null) {
+            searchEditText.setHintTextColor(ContextCompat.getColor(this, R.color.colorTextSecondary));
+            searchEditText.setTextColor(ContextCompat.getColor(this, R.color.colorTextPrimary));
+        }
         
         // Khởi tạo SearchHistoryManager
         searchHistoryManager = new SearchHistoryManager(this);

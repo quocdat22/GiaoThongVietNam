@@ -13,6 +13,7 @@ public class SharedPreferencesManager {
     
     private static final String PREFS_NAME = "com.example.giaothong.preferences";
     private static final String KEY_PINNED_TRAFFIC_SIGNS = "pinned_traffic_signs";
+    private static final String KEY_DARK_MODE = "dark_mode";
     
     private final SharedPreferences sharedPreferences;
     
@@ -65,5 +66,23 @@ public class SharedPreferencesManager {
         Set<String> pinnedSignIds = getPinnedTrafficSignIds();
         pinnedSignIds.remove(signId);
         savePinnedTrafficSignIds(pinnedSignIds);
+    }
+    
+    /**
+     * Lưu trạng thái chế độ tối
+     * @param isDarkMode true nếu đang ở chế độ tối, false nếu đang ở chế độ sáng
+     */
+    public void setDarkMode(boolean isDarkMode) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(KEY_DARK_MODE, isDarkMode);
+        editor.apply();
+    }
+    
+    /**
+     * Lấy trạng thái chế độ tối
+     * @return true nếu đang ở chế độ tối, false nếu đang ở chế độ sáng
+     */
+    public boolean isDarkMode() {
+        return sharedPreferences.getBoolean(KEY_DARK_MODE, false);
     }
 } 

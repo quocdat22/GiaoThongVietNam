@@ -123,7 +123,7 @@ public class TrafficSignAdapter extends RecyclerView.Adapter<TrafficSignAdapter.
                 cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.colorPinnedBackground));
             } else {
                 pinIndicator.setVisibility(View.GONE);
-                cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white));
+                cardView.setCardBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
             }
             
             // Tải hình ảnh

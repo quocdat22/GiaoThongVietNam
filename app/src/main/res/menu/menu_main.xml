@@ -8,6 +8,12 @@
         android:checkable="true"
         app:showAsAction="ifRoom" />
         
+    <item android:id="@+id/action_toggle_dark_mode"
+        android:title="@string/toggle_dark_mode"
+        android:icon="@drawable/ic_theme_selector"
+        android:checkable="true"
+        app:showAsAction="ifRoom" />
+        
     <item android:id="@+id/action_clear_history"
         android:title="@string/clear_history"
         android:icon="@drawable/ic_history"
