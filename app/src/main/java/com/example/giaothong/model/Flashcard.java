@@ -7,13 +7,14 @@ import java.io.Serializable;
  */
 public class Flashcard implements Serializable {
     private long id;
+    private long deckId;
     private String question; // Mặt trước - câu hỏi
     private String answer;   // Mặt sau - câu trả lời
     private String imageUrl; // Đường dẫn hình ảnh (nếu có)
     private int difficulty;  // Mức độ khó (1-5)
-    private long lastReviewed; // Thời gian lần cuối xem lại
     private int reviewCount;   // Số lần đã xem lại
-    private long deckId;       // ID của bộ flashcard
+    private long lastReviewed; // Thời gian lần cuối xem lại
+    private long nextReviewTime;
 
     public Flashcard() {
         this.lastReviewed = System.currentTimeMillis();
@@ -38,6 +39,14 @@ public class Flashcard implements Serializable {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getDeckId() {
+        return deckId;
+    }
+
+    public void setDeckId(long deckId) {
+        this.deckId = deckId;
     }
 
     public String getQuestion() {
@@ -69,17 +78,9 @@ public class Flashcard implements Serializable {
     }
 
     public void setDifficulty(int difficulty) {
-        if (difficulty < 1) difficulty = 1;
-        if (difficulty > 5) difficulty = 5;
-        this.difficulty = difficulty;
-    }
-
-    public long getLastReviewed() {
-        return lastReviewed;
-    }
-
-    public void setLastReviewed(long lastReviewed) {
-        this.lastReviewed = lastReviewed;
+        if (difficulty >= 1 && difficulty <= 5) {
+            this.difficulty = difficulty;
+        }
     }
 
     public int getReviewCount() {
@@ -94,11 +95,42 @@ public class Flashcard implements Serializable {
         this.reviewCount++;
     }
 
-    public long getDeckId() {
-        return deckId;
+    public long getLastReviewed() {
+        return lastReviewed;
     }
 
-    public void setDeckId(long deckId) {
-        this.deckId = deckId;
+    public void setLastReviewed(long lastReviewed) {
+        this.lastReviewed = lastReviewed;
+    }
+
+    public long getNextReviewTime() {
+        return nextReviewTime;
+    }
+
+    public void setNextReviewTime(long nextReviewTime) {
+        this.nextReviewTime = nextReviewTime;
+    }
+
+    /**
+     * Tính toán thời gian xem lại tiếp theo dựa trên thuật toán spaced repetition đơn giản
+     * Công thức: nextReviewTime = lastReviewed + (factor * 24 * 60 * 60 * 1000)
+     * Trong đó factor phụ thuộc vào độ khó và số lần xem lại.
+     */
+    public void calculateNextReviewTime() {
+        if (lastReviewed == 0) {
+            // Chưa từng xem lại, đặt thời gian xem lại ngay lập tức
+            this.nextReviewTime = System.currentTimeMillis();
+            return;
+        }
+        
+        // Hệ số cơ bản dựa trên độ khó (khó hơn = xem lại sớm hơn)
+        double factor = 5.0 - difficulty; // 1.0 - 4.0
+        
+        // Tăng hệ số dựa trên số lần xem lại (xem nhiều hơn = khoảng cách lâu hơn)
+        factor = factor + Math.min(reviewCount, 10) * 0.5; // Tối đa +5.0
+        
+        // Tính thời gian xem lại (factor ngày sau thời điểm cuối cùng xem lại)
+        long delayMillis = (long) (factor * 24 * 60 * 60 * 1000);
+        this.nextReviewTime = lastReviewed + delayMillis;
     }
 } 

@@ -42,7 +42,14 @@ public class BienBaoItem {
 
     // Phương thức để chuyển đổi sang đối tượng TrafficSign
     public TrafficSign toTrafficSign(String category, int index) {
-        String id = category.substring(0, 1).toUpperCase() + String.format("%03d", index);
+        // Tạo ID ổn định từ tên và loại biển báo thay vì dùng index
+        // Dùng tên biển và loại để tạo ID ổn định
+        String stableName = tenBien != null ? tenBien.trim().toLowerCase().replaceAll("\\s+", "_") : "";
+        if (stableName.isEmpty()) {
+            stableName = "unknown_" + index; // Trường hợp tên rỗng vẫn dùng index
+        }
+        String id = category + "_" + stableName;
+        
         return new TrafficSign(id, tenBien, moTa, hinhAnh, category);
     }
 } 

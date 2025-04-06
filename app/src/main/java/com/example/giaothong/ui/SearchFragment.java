@@ -42,6 +42,7 @@ public class SearchFragment extends Fragment implements TrafficSignDetailBottomS
     private SearchView searchView;
     private SearchHistoryPopup searchHistoryPopup;
     private View cardSearch;
+    private boolean isTextClearedByCloseButton = false;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -146,6 +147,24 @@ public class SearchFragment extends Fragment implements TrafficSignDetailBottomS
             hideSearchHistory();
         });
         
+        // Tìm và thiết lập click listener cho nút close
+        View closeButton = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+        if (closeButton != null) {
+            closeButton.setOnClickListener(v -> {
+                // Xử lý trước khi gọi xóa mặc định của SearchView
+                isTextClearedByCloseButton = true;
+                
+                // Xóa text trong searchView (sẽ gọi onQueryTextChange)
+                searchView.setQuery("", false);
+                
+                // Ẩn lịch sử tìm kiếm
+                hideSearchHistory();
+                
+                // Đặt lại focus (tùy chọn)
+                searchView.clearFocus();
+            });
+        }
+        
         // Setup search view query listener
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -154,26 +173,35 @@ public class SearchFragment extends Fragment implements TrafficSignDetailBottomS
                 if (!query.trim().isEmpty()) {
                     searchHistoryManager.addSearchQuery(query);
                     hideSearchHistory();
-                    viewModel.setSearchQuery(query);
                 }
                 return true;
             }
             
             @Override
             public boolean onQueryTextChange(String newText) {
-                // Only show history when there's text but not for empty queries
+                // Hiển thị lịch sử khi không có text và ẩn khi có text
                 if (newText.trim().isEmpty()) {
+                    if (searchView.hasFocus() && !isTextClearedByCloseButton) {
+                        showSearchHistory();
+                    }
+                    // Reset flag sau khi đã kiểm tra
+                    isTextClearedByCloseButton = false;
+                    
+                    // Xóa bộ lọc tìm kiếm khi text rỗng
+                    viewModel.setSearchQuery("");
+                } else {
                     hideSearchHistory();
-                } else if (searchView.hasFocus()) {
-                    showSearchHistory();
+                    
+                    // Thực hiện tìm kiếm theo từng ký tự đang nhập
+                    viewModel.setSearchQuery(newText);
                 }
                 return true;
             }
         });
         
-        // Show search history when search view is focused
+        // Show search history when search view is focused but empty
         searchView.setOnQueryTextFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus && searchView.getQuery().length() > 0) {
+            if (hasFocus && searchView.getQuery().length() == 0 && !isTextClearedByCloseButton) {
                 showSearchHistory();
             } else {
                 hideSearchHistory();
@@ -190,15 +218,15 @@ public class SearchFragment extends Fragment implements TrafficSignDetailBottomS
                 viewModel.setCategory("");
                 return;
             } else if (checkedId == R.id.chipCam) {
-                viewModel.setCategory("P");
+                viewModel.setCategory("bien_bao_cam");
             } else if (checkedId == R.id.chipNguyHiem) {
-                viewModel.setCategory("W");
+                viewModel.setCategory("bien_nguy_hiem_va_canh_bao");
             } else if (checkedId == R.id.chipHieuLenh) {
-                viewModel.setCategory("R");
+                viewModel.setCategory("bien_hieu_lenh");
             } else if (checkedId == R.id.chipChiDan) {
-                viewModel.setCategory("I");
+                viewModel.setCategory("bien_chi_dan");
             } else if (checkedId == R.id.chipPhu) {
-                viewModel.setCategory("S");
+                viewModel.setCategory("bien_phu");
             }
             
             // Ensure showing all if a category is selected (not just pinned)

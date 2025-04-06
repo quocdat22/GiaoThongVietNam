@@ -20,9 +20,14 @@ public class FlashcardDeckAdapter extends RecyclerView.Adapter<FlashcardDeckAdap
     private final Context context;
     private List<FlashcardDeck> decks;
     private OnItemClickListener onItemClickListener;
+    private OnItemLongClickListener onItemLongClickListener;
 
     public interface OnItemClickListener {
         void onItemClick(FlashcardDeck deck, int position);
+    }
+    
+    public interface OnItemLongClickListener {
+        boolean onItemLongClick(FlashcardDeck deck, int position);
     }
 
     public FlashcardDeckAdapter(Context context, List<FlashcardDeck> decks) {
@@ -32,6 +37,10 @@ public class FlashcardDeckAdapter extends RecyclerView.Adapter<FlashcardDeckAdap
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.onItemClickListener = listener;
+    }
+    
+    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
+        this.onItemLongClickListener = listener;
     }
 
     public void updateData(List<FlashcardDeck> newDecks) {
@@ -78,17 +87,20 @@ public class FlashcardDeckAdapter extends RecyclerView.Adapter<FlashcardDeckAdap
                     onItemClickListener.onItemClick(decks.get(position), position);
                 }
             });
+            
+            itemView.setOnLongClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && onItemLongClickListener != null) {
+                    return onItemLongClickListener.onItemLongClick(decks.get(position), position);
+                }
+                return false;
+            });
         }
 
         public void bind(FlashcardDeck deck) {
             textDeckName.setText(deck.getName());
             
-            if (deck.getDescription() != null && !deck.getDescription().isEmpty()) {
-                textDeckDescription.setText(deck.getDescription());
-                textDeckDescription.setVisibility(View.VISIBLE);
-            } else {
-                textDeckDescription.setVisibility(View.GONE);
-            }
+            textDeckDescription.setVisibility(View.GONE);
             
             if (deck.getCategory() != null && !deck.getCategory().isEmpty()) {
                 textDeckCategory.setText(deck.getCategory());
@@ -99,19 +111,7 @@ public class FlashcardDeckAdapter extends RecyclerView.Adapter<FlashcardDeckAdap
             
             textCardCount.setText(context.getString(R.string.cards_count, deck.getCardCount()));
             
-            if (deck.getLastModified() > 0) {
-                String timeAgo = DateUtils.getRelativeTimeSpanString(
-                        deck.getLastModified(),
-                        System.currentTimeMillis(),
-                        DateUtils.MINUTE_IN_MILLIS,
-                        DateUtils.FORMAT_ABBREV_RELATIVE
-                ).toString();
-                
-                textLastModified.setText(context.getString(R.string.last_modified, timeAgo));
-                textLastModified.setVisibility(View.VISIBLE);
-            } else {
-                textLastModified.setVisibility(View.GONE);
-            }
+            textLastModified.setVisibility(View.GONE);
         }
     }
 } 

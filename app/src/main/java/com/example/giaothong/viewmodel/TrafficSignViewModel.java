@@ -1,9 +1,11 @@
 package com.example.giaothong.viewmodel;
 
+import android.app.Application;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.example.giaothong.model.TrafficSign;
 import com.example.giaothong.repository.TrafficSignRepository;
@@ -16,17 +18,18 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * ViewModel để quản lý dữ liệu biển báo
+ * ViewModel cho màn hình danh sách biển báo giao thông
+ * Quản lý dữ liệu và nghiệp vụ lọc, tìm kiếm
  */
-public class TrafficSignViewModel extends ViewModel {
+public class TrafficSignViewModel extends AndroidViewModel {
     
-    // LiveData gốc (dữ liệu đầy đủ từ repository)
+    // LiveData chứa danh sách biển báo gốc (chưa lọc)
     private final MutableLiveData<List<TrafficSign>> originalTrafficSigns = new MutableLiveData<>();
     
-    // LiveData đã lọc (được hiển thị cho người dùng)
+    // LiveData chứa danh sách biển báo đã lọc để hiển thị
     private final MediatorLiveData<List<TrafficSign>> filteredTrafficSigns = new MediatorLiveData<>();
     
-    // Danh mục hiện tại được chọn để lọc
+    // Danh mục đang lọc hiện tại
     private String currentCategory = "";
     
     // Từ khóa tìm kiếm hiện tại
@@ -41,8 +44,10 @@ public class TrafficSignViewModel extends ViewModel {
     private final TrafficSignRepository repository;
     private SharedPreferencesManager prefsManager;
     
-    public TrafficSignViewModel() {
-        repository = new TrafficSignRepository();
+    // Khởi tạo ViewModel
+    public TrafficSignViewModel(@NonNull Application application) {
+        super(application);
+        repository = TrafficSignRepository.getInstance(application);
         
         // Thêm source cho MediatorLiveData
         filteredTrafficSigns.addSource(originalTrafficSigns, trafficSigns -> {
@@ -54,12 +59,40 @@ public class TrafficSignViewModel extends ViewModel {
     
     public void setPreferencesManager(SharedPreferencesManager manager) {
         this.prefsManager = manager;
+        
+        // Lấy danh sách ID đã ghim (tương thích ngược)
         pinnedSignIds = prefsManager.getPinnedTrafficSignIds();
+        
+        // Lấy danh sách chi tiết các biển báo đã ghim
+        List<TrafficSign> pinnedSigns = prefsManager.getPinnedTrafficSignDetails();
         
         // Áp dụng trạng thái ghim lên dữ liệu gốc nếu có
         List<TrafficSign> currentSigns = originalTrafficSigns.getValue();
-        if (currentSigns != null) {
-            updatePinnedStatus(currentSigns);
+        if (currentSigns != null && !currentSigns.isEmpty()) {
+            // Đầu tiên thử áp dụng từ danh sách chi tiết (chính xác hơn)
+            for (TrafficSign currentSign : currentSigns) {
+                // Mặc định không ghim
+                currentSign.setPinned(false);
+                
+                // Kiểm tra nếu có trong danh sách ghim chi tiết
+                for (TrafficSign pinnedSign : pinnedSigns) {
+                    // So sánh theo tên và loại, không chỉ theo ID
+                    if (currentSign.getName() != null && pinnedSign.getName() != null &&
+                        currentSign.getName().equals(pinnedSign.getName()) &&
+                        currentSign.getCategory() != null && pinnedSign.getCategory() != null &&
+                        currentSign.getCategory().equals(pinnedSign.getCategory())) {
+                        currentSign.setPinned(true);
+                        break;
+                    }
+                }
+            }
+            
+            // Sau đó thử áp dụng từ ID đã ghim (tương thích ngược)
+            if (pinnedSigns.isEmpty() && !pinnedSignIds.isEmpty()) {
+                updatePinnedStatus(currentSigns);
+            }
+            
+            // Cập nhật danh sách
             originalTrafficSigns.setValue(currentSigns);
         }
     }
@@ -146,11 +179,19 @@ public class TrafficSignViewModel extends ViewModel {
         // Cập nhật danh sách ID đã ghim
         if (sign.isPinned()) {
             pinnedSignIds.add(sign.getId());
+            // Lưu thông tin chi tiết biển báo đã ghim
+            if (prefsManager != null) {
+                prefsManager.savePinnedTrafficSign(sign);
+            }
         } else {
             pinnedSignIds.remove(sign.getId());
+            // Xóa thông tin chi tiết biển báo
+            if (prefsManager != null) {
+                prefsManager.removePinnedTrafficSign(sign);
+            }
         }
         
-        // Lưu thay đổi vào SharedPreferences
+        // Lưu thay đổi ID vào SharedPreferences (cho khả năng tương thích ngược)
         if (prefsManager != null) {
             prefsManager.savePinnedTrafficSignIds(pinnedSignIds);
         }
@@ -222,12 +263,29 @@ public class TrafficSignViewModel extends ViewModel {
      * @param isPinned Trạng thái ghim mới
      */
     public void updatePinStatus(TrafficSign trafficSign, boolean isPinned) {
+        // Cập nhật trạng thái ghim cho biển báo
+        trafficSign.setPinned(isPinned);
+        
         // Tìm và cập nhật biển báo trong danh sách gốc
         if (originalTrafficSigns.getValue() != null) {
+            boolean foundInList = false;
             for (TrafficSign sign : originalTrafficSigns.getValue()) {
-                if (sign.getId().equals(trafficSign.getId())) {
+                // Kiểm tra khớp theo tên và loại, không chỉ ID
+                if (sign.getName().equals(trafficSign.getName()) && 
+                    sign.getCategory().equals(trafficSign.getCategory())) {
                     sign.setPinned(isPinned);
+                    foundInList = true;
                     break;
+                }
+            }
+            
+            // Nếu không tìm thấy biển báo có tên và loại khớp, thử tìm theo ID (tương thích ngược)
+            if (!foundInList) {
+                for (TrafficSign sign : originalTrafficSigns.getValue()) {
+                    if (sign.getId().equals(trafficSign.getId())) {
+                        sign.setPinned(isPinned);
+                        break;
+                    }
                 }
             }
         }
@@ -239,9 +297,22 @@ public class TrafficSignViewModel extends ViewModel {
             if (!pinnedSignIds.contains(signId)) {
                 pinnedSignIds.add(signId);
             }
+            // Lưu thông tin chi tiết biển báo
+            if (prefsManager != null) {
+                prefsManager.savePinnedTrafficSign(trafficSign);
+            }
         } else {
             // Xóa khỏi danh sách nếu có
             pinnedSignIds.remove(signId);
+            // Xóa thông tin chi tiết biển báo
+            if (prefsManager != null) {
+                prefsManager.removePinnedTrafficSign(trafficSign);
+            }
+        }
+        
+        // Lưu thay đổi ID vào SharedPreferences (cho khả năng tương thích ngược)
+        if (prefsManager != null) {
+            prefsManager.savePinnedTrafficSignIds(pinnedSignIds);
         }
         
         // Cập nhật lại danh sách hiển thị

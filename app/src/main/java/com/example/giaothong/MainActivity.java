@@ -1,6 +1,7 @@
 package com.example.giaothong;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -8,6 +9,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
@@ -19,8 +21,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.giaothong.repository.TrafficSignRepository;
 import com.example.giaothong.ui.FlashcardsFragment;
 import com.example.giaothong.ui.SearchFragment;
+import com.example.giaothong.ui.fragments.SettingsFragment;
+import com.example.giaothong.ui.quiz.QuizFragment;
+import com.example.giaothong.utils.OfflineImageManager;
 import com.example.giaothong.utils.SearchHistoryManager;
 import com.example.giaothong.utils.SharedPreferencesManager;
 import com.example.giaothong.utils.ThemeUtils;
@@ -29,12 +35,15 @@ import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final String TAG = "MainActivity";
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private Toolbar toolbar;
     private SharedPreferencesManager prefsManager;
     private MenuItem darkModeItem;
     private Fragment currentFragment;
+    private TrafficSignRepository trafficSignRepository;
+    private OfflineImageManager offlineImageManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,11 +80,52 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return insets;
         });
         
+        // Khởi tạo TrafficSignRepository và bắt đầu tải dữ liệu
+        initializeDataManagers();
+        
         // Mặc định hiển thị màn hình tìm kiếm khi khởi động
         if (savedInstanceState == null) {
             showSearchScreen();
             navigationView.setCheckedItem(R.id.nav_search);
         }
+    }
+    
+    /**
+     * Khởi tạo các thành phần quản lý dữ liệu và bắt đầu tải trước dữ liệu
+     */
+    private void initializeDataManagers() {
+        Log.d(TAG, "Bắt đầu khởi tạo trình quản lý dữ liệu và tải dữ liệu");
+        
+        // Khởi tạo OfflineImageManager
+        offlineImageManager = new OfflineImageManager(this);
+        
+        // Khởi tạo TrafficSignRepository
+        trafficSignRepository = TrafficSignRepository.getInstance(this);
+        
+        // Tạo thread để tải trước các biển báo đã ghim trong nền
+        new Thread(() -> {
+            Log.d(TAG, "Bắt đầu tải trước dữ liệu trong nền");
+            
+            // Đợi chút để màn hình chính được hiển thị trước
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            
+            // Tải trước biển báo đã ghim
+            trafficSignRepository.preloadPinnedImages();
+            
+            // Chờ thêm một chút trước khi tải tất cả hình ảnh
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            
+            // Tải trước tất cả hình ảnh
+            trafficSignRepository.preloadAllImages();
+        }).start();
     }
     
     @Override
@@ -97,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
     
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         
         if (id == R.id.action_clear_pins) {
@@ -108,6 +158,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return true;
         } else if (id == R.id.action_toggle_dark_mode) {
             toggleDarkMode(item);
+            return true;
+        } else if (id == R.id.action_settings) {
+            showSettingsScreen();
             return true;
         }
         
@@ -159,16 +212,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             showSearchScreen();
         } else if (id == R.id.nav_flashcards) {
             showFlashcardsScreen();
+        } else if (id == R.id.nav_quiz) {
+            showQuizScreen();
         } else if (id == R.id.nav_settings) {
-            Toast.makeText(this, "Tính năng đang phát triển", Toast.LENGTH_SHORT).show();
+            showSettingsScreen();
         } else if (id == R.id.nav_about) {
-            Toast.makeText(this, "Tính năng đang phát triển", Toast.LENGTH_SHORT).show();
+            showAboutDialog();
         }
         
         drawerLayout.closeDrawer(GravityCompat.START);
-        return true;
-    }
-    
+                return true;
+            }
+
     /**
      * Hiển thị màn hình tìm kiếm
      */
@@ -190,6 +245,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
     
     /**
+     * Hiển thị màn hình cài đặt
+     */
+    private void showSettingsScreen() {
+        setTitle(getString(R.string.menu_settings));
+        Fragment fragment = com.example.giaothong.ui.fragments.SettingsFragment.newInstance();
+        switchFragment(fragment);
+        navigationView.setCheckedItem(R.id.nav_settings);
+    }
+    
+    /**
+     * Hiển thị màn hình trắc nghiệm
+     */
+    private void showQuizScreen() {
+        setTitle(getString(R.string.menu_quiz));
+        Fragment fragment = new QuizFragment();
+        switchFragment(fragment);
+        navigationView.setCheckedItem(R.id.nav_quiz);
+    }
+    
+    /**
+     * Hiển thị dialog thông tin ứng dụng
+     */
+    private void showAboutDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.menu_about)
+               .setMessage("Ứng dụng Biển báo Giao thông\nPhiên bản 1.0\n\nPhát triển bởi:\nNguyễn Văn A\n\n© 2023 Bản quyền")
+               .setIcon(R.drawable.ic_info)
+               .setPositiveButton(R.string.close, (dialog, which) -> dialog.dismiss());
+        
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+    
+    /**
      * Chuyển đổi giữa các fragment
      */
     private void switchFragment(Fragment fragment) {
@@ -199,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .commit();
         currentFragment = fragment;
     }
-    
+
     @Override
     public void onBackPressed() {
         // Xử lý nút back, đóng drawer nếu đang mở

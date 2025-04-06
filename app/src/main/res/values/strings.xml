@@ -36,15 +36,13 @@
     
     <!-- New strings for dark mode feature -->
     <string name="error_loading_data">Lỗi khi tải dữ liệu</string>
-    <string name="toggle_dark_mode">Chế độ tối</string>
-    <string name="dark_mode_on">Đã bật chế độ tối</string>
-    <string name="dark_mode_off">Đã tắt chế độ tối</string>
     
     <!-- New strings for Navigation Drawer and Flashcards -->
     <string name="nav_header_desc">Navigation header</string>
     <string name="nav_header_subtitle">Hỗ trợ học các biển báo giao thông</string>
     <string name="menu_search">Tìm kiếm</string>
     <string name="menu_flashcards">Thẻ ghi nhớ</string>
+    <string name="menu_quiz">Trắc nghiệm</string>
     <string name="menu_more">Thêm</string>
     <string name="menu_settings">Cài đặt</string>
     <string name="menu_about">Giới thiệu</string>
@@ -53,12 +51,12 @@
     <string name="navigation_drawer_open">Mở menu điều hướng</string>
     <string name="navigation_drawer_close">Đóng menu điều hướng</string>
     <string name="flashcards_title">Thẻ ghi nhớ</string>
-    <string name="flashcards_placeholder">Chức năng học thẻ ghi nhớ sẽ sớm có mặt</string>
+    <string name="flashcards_placeholder">Chưa có bộ thẻ nào.\nNhấn "+" để tạo bộ thẻ mới.</string>
     <string name="flashcard_image">Hình ảnh thẻ ghi nhớ</string>
     <string name="question">Câu hỏi</string>
     <string name="answer">Câu trả lời</string>
     <string name="tap_to_flip">Chạm để lật thẻ</string>
-    <string name="studying_deck">Đang học</string>
+    <string name="studying_deck">Học thẻ ghi nhớ</string>
     <string name="previous">Trước</string>
     <string name="next">Tiếp</string>
     <string name="flip">Lật thẻ</string>
@@ -83,10 +81,105 @@
     <string name="start_study">Bắt đầu học</string>
     <string name="cards_count">%d thẻ</string>
     <string name="last_modified">Cập nhật: %s</string>
-    <string name="card_progress">Thẻ %d/%d</string>
-    <string name="study_complete">Hoàn thành!</string>
+    <string name="card_progress">Thẻ %1$d / %2$d</string>
+    <string name="study_complete">Bạn đã hoàn thành!</string>
     <string name="difficulty_easy">Dễ</string>
     <string name="difficulty_medium">Trung bình</string>
     <string name="difficulty_hard">Khó</string>
-    <string name="create_from_traffic_signs">Tạo từ biển báo</string>
+    <string name="create_from_traffic_signs">Tạo bộ thẻ từ biển báo</string>
+    <string name="edit_flashcards">Chỉnh sửa thẻ ghi nhớ</string>
+    <string name="add_flashcard">Thêm thẻ mới</string>
+    <string name="edit_flashcard">Sửa thẻ</string>
+    <string name="delete_flashcard">Xóa thẻ</string>
+    <string name="image">Hình ảnh</string>
+    <string name="select_image">Chọn ảnh</string>
+    <string name="remove_image">Xóa ảnh</string>
+    <string name="image_preview">Xem trước hình ảnh</string>
+    <string name="flashcard_empty_state">Chưa có thẻ nào trong bộ này.\nNhấn "+" để thêm thẻ mới.</string>
+    <string name="confirm_delete_card">Bạn có chắc chắn muốn xóa thẻ này?</string>
+    <string name="question_required">Vui lòng nhập câu hỏi</string>
+    <string name="answer_required">Vui lòng nhập câu trả lời</string>
+    <string name="select_sign_category">Loại biển báo</string>
+    <string name="number_of_cards">Số lượng thẻ:</string>
+    <string name="card_count_setting">%d thẻ</string>
+    <string name="random_card_order">Hiển thị thẻ theo thứ tự ngẫu nhiên</string>
+    <string name="create">Tạo mới</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    
+    <!-- Strings cho tính năng Flashcard tùy chỉnh -->
+    <string name="create_custom_deck">Tạo bộ thẻ tùy chỉnh</string>
+    <string name="create_random_deck">Tạo bộ thẻ ngẫu nhiên</string>
+    <string name="custom_card_count">Số lượng thẻ:</string>
+    <string name="dialog_title">Tạo bộ thẻ mới</string>
+    <string name="please_enter_deck_name">Vui lòng nhập tên bộ thẻ</string>
+    <string name="deck_created">Đã tạo bộ thẻ \"%1$s\" với %2$d thẻ</string>
+    <string name="no_traffic_sign_data">Không có dữ liệu biển báo</string>
+    <string name="cards">thẻ</string>
+    <string name="all_categories">Tất cả các loại</string>
+    <string name="no_signs_in_category">Không có biển báo nào thuộc loại đã chọn</string>
+    
+    <!-- Splash Screen -->
+    <string name="loading_data">Đang tải dữ liệu...</string>
+    <string name="loading_data_signs">Đang tải biển báo...</string>
+    <string name="loading_data_images">Đang tải hình ảnh...</string>
+    <string name="loading_complete">Tải hoàn tất</string>
+    <string name="app_version">Phiên bản 1.0.0</string>
+    
+    <!-- Offline Mode -->
+    <string name="offline_mode">Chế độ ngoại tuyến</string>
+    <string name="offline_mode_enable">Sử dụng dữ liệu ngoại tuyến khi không có mạng</string>
+    <string name="offline_download">Tải dữ liệu cho sử dụng ngoại tuyến</string>
+    <string name="offline_last_download">Lần cuối tải dữ liệu: %s</string>
+    <string name="offline_downloading">Đang tải dữ liệu...</string>
+    <string name="offline_download_success">Tải dữ liệu thành công!</string>
+    <string name="offline_download_fail">Tải dữ liệu thất bại. Vui lòng thử lại.</string>
+    <string name="offline_no_network">Không có kết nối mạng</string>
+    <string name="offline_clear_data">Xóa dữ liệu ngoại tuyến</string>
+    <string name="offline_data_cleared">Đã xóa dữ liệu ngoại tuyến</string>
+    <string name="offline_data_management">Quản lý dữ liệu ngoại tuyến</string>
+    <string name="confirm_title">Xác nhận</string>
+    <string name="confirm_clear_offline_data">Bạn có chắc chắn muốn xóa tất cả dữ liệu ngoại tuyến?</string>
+    
+    <!-- Settings strings -->
+    <string name="toggle_dark_mode">Chế độ tối</string>
+    <string name="dark_mode_enabled">Đã bật chế độ tối</string>
+    <string name="dark_mode_disabled">Đã tắt chế độ tối</string>
+    <string name="dark_mode_on">Đã bật chế độ tối</string>
+    <string name="dark_mode_off">Đã tắt chế độ tối</string>
+    <string name="close">Đóng</string>
+
+    <!-- Quiz strings -->
+    <string name="quiz_title">Trắc nghiệm biển báo giao thông</string>
+    <string name="quiz_description">Kiểm tra kiến thức của bạn về các biển báo giao thông với các bài trắc nghiệm.</string>
+    <string name="quiz_start_random">Bắt đầu bài trắc nghiệm ngẫu nhiên</string>
+    <string name="quiz_start_category">Chọn danh mục biển báo</string>
+    <string name="quiz_history">Lịch sử bài trắc nghiệm</string>
+    <string name="quiz_no_history">Bạn chưa làm bài trắc nghiệm nào</string>
+    <string name="quiz_create_new">Tạo bài trắc nghiệm mới</string>
+    <string name="quiz_submit">Nộp bài</string>
+    <string name="quiz_next">Câu tiếp theo</string>
+    <string name="quiz_previous">Câu trước</string>
+    <string name="quiz_complete">Hoàn thành</string>
+    <string name="quiz_result_title">Kết quả bài trắc nghiệm</string>
+    <string name="quiz_result_correct">Số câu đúng: %1$d/%2$d</string>
+    <string name="quiz_result_score">Điểm số: %1$.1f</string>
+    <string name="quiz_result_review">Xem lại bài làm</string>
+    <string name="quiz_result_new">Làm bài mới</string>
+    <string name="quiz_review_title">Xem lại bài làm</string>
+    <string name="quiz_back_to_results">Quay lại kết quả</string>
+    <string name="quiz_correct_answer">Đáp án đúng</string>
+    <string name="quiz_your_answer">Đáp án của bạn</string>
+    <string name="quiz_explanation">Giải thích</string>
+    <string name="quiz_question_format">Câu %1$d/%2$d</string>
+    <string name="quiz_default_question">Biển báo này có ý nghĩa gì?</string>
+    <string name="quiz_create_custom">Tạo bài kiểm tra tùy chỉnh</string>
+    <string name="quiz_create_instruction">Chọn loại biển báo và số lượng câu hỏi:</string>
+    <string name="quiz_number_of_questions">Số lượng câu hỏi:</string>
+    <string name="quiz_create">Tạo bài kiểm tra</string>
+    <string name="quiz_answer_correct">Đúng!</string>
+    <string name="quiz_answer_incorrect">Sai! Đáp án đúng là: %s</string>
+    <string name="delete">Xóa</string>
+    <string name="confirm_delete">Xác nhận xóa</string>
+    <string name="confirm_delete_flashcard">Bạn có chắc chắn muốn xóa thẻ ghi nhớ này?</string>
 </resources>

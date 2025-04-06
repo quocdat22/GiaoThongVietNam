@@ -16,6 +16,7 @@ public class FlashcardDeck implements Serializable {
     private long lastModified;
     private int cardCount;
     private List<Flashcard> cards;
+    private boolean randomOrder;
 
     public FlashcardDeck() {
         this.createdAt = System.currentTimeMillis();
@@ -117,19 +118,64 @@ public class FlashcardDeck implements Serializable {
         updateLastModified();
     }
 
-    public void removeCard(Flashcard card) {
-        if (this.cards != null) {
-            this.cards.remove(card);
+    public boolean removeCard(Flashcard card) {
+        if (this.cards != null && this.cards.remove(card)) {
             this.cardCount = this.cards.size();
             updateLastModified();
+            return true;
         }
+        return false;
     }
 
-    public void removeCard(int position) {
+    public Flashcard removeCard(int position) {
         if (this.cards != null && position >= 0 && position < this.cards.size()) {
-            this.cards.remove(position);
+            Flashcard removed = this.cards.remove(position);
             this.cardCount = this.cards.size();
             updateLastModified();
+            return removed;
         }
+        return null;
+    }
+
+    public boolean updateCard(int position, Flashcard card) {
+        if (this.cards != null && position >= 0 && position < this.cards.size()) {
+            card.setDeckId(this.id);
+            this.cards.set(position, card);
+            updateLastModified();
+            return true;
+        }
+        return false;
+    }
+
+    public void updateCardCount() {
+        this.cardCount = this.cards != null ? this.cards.size() : 0;
+    }
+
+    public List<Flashcard> getDueCards(int limit) {
+        if (this.cards == null || this.cards.isEmpty()) {
+            return new ArrayList<>();
+        }
+        
+        List<Flashcard> dueCards = new ArrayList<>();
+        long now = System.currentTimeMillis();
+        
+        for (Flashcard card : this.cards) {
+            if (card.getNextReviewTime() <= now) {
+                dueCards.add(card);
+                if (dueCards.size() >= limit) {
+                    break;
+                }
+            }
+        }
+        
+        return dueCards;
+    }
+
+    public boolean isRandomOrder() {
+        return randomOrder;
+    }
+    
+    public void setRandomOrder(boolean randomOrder) {
+        this.randomOrder = randomOrder;
     }
 } 
