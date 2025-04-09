@@ -19,6 +19,7 @@ import com.example.giaothong.R;
 import com.example.giaothong.data.QuizHistoryManager;
 import com.example.giaothong.model.Quiz;
 import com.example.giaothong.model.QuizQuestion;
+import com.example.giaothong.utils.SoundHelper;
 
 import java.util.Locale;
 
@@ -216,10 +217,14 @@ public class QuizActivity extends AppCompatActivity {
         if (isCorrect) {
             textFeedback.setBackgroundResource(R.drawable.bg_feedback_correct);
             textFeedback.setText(getString(R.string.quiz_answer_correct));
+            // Phát âm thanh đúng
+            SoundHelper.playCorrectSound(this);
         } else {
             textFeedback.setBackgroundResource(R.drawable.bg_feedback_incorrect);
             String correctAnswer = currentQuestion.getOptions().get(currentQuestion.getCorrectAnswerIndex());
             textFeedback.setText(getString(R.string.quiz_answer_incorrect, correctAnswer));
+            // Phát âm thanh sai
+            SoundHelper.playWrongSound(this);
         }
     }
 

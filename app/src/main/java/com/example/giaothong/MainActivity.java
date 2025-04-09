@@ -1,5 +1,7 @@
 package com.example.giaothong;
 
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -7,11 +9,14 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
@@ -21,8 +26,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.giaothong.notification.ReminderManager;
 import com.example.giaothong.repository.TrafficSignRepository;
 import com.example.giaothong.ui.FlashcardsFragment;
+import com.example.giaothong.ui.MiniGameFragment;
 import com.example.giaothong.ui.SearchFragment;
 import com.example.giaothong.ui.fragments.SettingsFragment;
 import com.example.giaothong.ui.quiz.QuizFragment;
@@ -32,6 +39,8 @@ import com.example.giaothong.utils.SharedPreferencesManager;
 import com.example.giaothong.utils.ThemeUtils;
 import com.example.giaothong.viewmodel.TrafficSignViewModel;
 import com.google.android.material.navigation.NavigationView;
+
+import android.Manifest;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -44,6 +53,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Fragment currentFragment;
     private TrafficSignRepository trafficSignRepository;
     private OfflineImageManager offlineImageManager;
+    
+    // Đăng ký launcher để xin cấp quyền thông báo
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    // Quyền được cấp, thiết lập thông báo nhắc nhở nếu đã bật
+                    setupReminderIfEnabled();
+                } else {
+                    // Quyền bị từ chối, thông báo cho người dùng
+                    Toast.makeText(this,
+                            "Cần quyền thông báo để hiển thị nhắc nhở học tập",
+                            Toast.LENGTH_LONG).show();
+                    
+                    // Tắt tùy chọn nhắc nhở trong cài đặt
+                    prefsManager.setDailyReminderEnabled(false);
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +113,57 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (savedInstanceState == null) {
             showSearchScreen();
             navigationView.setCheckedItem(R.id.nav_search);
+        }
+        
+        // Kiểm tra quyền thông báo
+        checkNotificationPermission();
+    }
+    
+    /**
+     * Kiểm tra và xin cấp quyền thông báo trên Android 13+
+     */
+    private void checkNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+ yêu cầu quyền POST_NOTIFICATIONS
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) 
+                    != PackageManager.PERMISSION_GRANTED) {
+                
+                // Luôn yêu cầu quyền thông báo khi khởi động ứng dụng
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            } else {
+                // Đã có quyền, thiết lập thông báo nhắc nhở nếu đã bật
+                setupReminderIfEnabled();
+            }
+        } else {
+            // Các phiên bản Android cũ hơn không yêu cầu quyền cụ thể
+            setupReminderIfEnabled();
+        }
+    }
+    
+    /**
+     * Thiết lập thông báo nhắc nhở nếu đã bật trong cài đặt
+     */
+    private void setupReminderIfEnabled() {
+        if (prefsManager.isDailyReminderEnabled()) {
+            ReminderManager reminderManager = new ReminderManager(this);
+            
+            // Trên Android 12+, kiểm tra quyền SCHEDULE_EXACT_ALARM
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !reminderManager.canScheduleExactAlarms()) {
+                // Lưu log thay vì hiện thông báo (để tránh làm phiền người dùng) 
+                Log.w(TAG, "Không có quyền báo thức chính xác. Thông báo có thể không chính xác.");
+            }
+            
+            // Vẫn lên lịch thông báo (sẽ sử dụng inexact alarm nếu không có quyền)
+            boolean success = reminderManager.scheduleDailyReminder(
+                    prefsManager.getReminderHour(),
+                    prefsManager.getReminderMinute()
+            );
+            
+            if (success) {
+                Log.d(TAG, "Đã thiết lập thông báo nhắc nhở học tập");
+            } else {
+                Log.e(TAG, "Không thể thiết lập thông báo nhắc nhở học tập");
+            }
         }
     }
     
@@ -214,6 +291,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             showFlashcardsScreen();
         } else if (id == R.id.nav_quiz) {
             showQuizScreen();
+        } else if (id == R.id.nav_mini_game) {
+            showMiniGameScreen();
         } else if (id == R.id.nav_settings) {
             showSettingsScreen();
         } else if (id == R.id.nav_about) {
@@ -221,8 +300,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         
         drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
-            }
+        return true;
+    }
 
     /**
      * Hiển thị màn hình tìm kiếm
@@ -262,6 +341,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Fragment fragment = new QuizFragment();
         switchFragment(fragment);
         navigationView.setCheckedItem(R.id.nav_quiz);
+    }
+    
+    /**
+     * Hiển thị màn hình mini game
+     */
+    private void showMiniGameScreen() {
+        setTitle(getString(R.string.menu_mini_game));
+        Fragment fragment = MiniGameFragment.newInstance();
+        switchFragment(fragment);
+        navigationView.setCheckedItem(R.id.nav_mini_game);
     }
     
     /**

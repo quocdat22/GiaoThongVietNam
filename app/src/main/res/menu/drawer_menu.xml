@@ -16,6 +16,10 @@
             android:id="@+id/nav_quiz"
             android:icon="@drawable/ic_quiz"
             android:title="@string/menu_quiz" />
+        <item
+            android:id="@+id/nav_mini_game"
+            android:icon="@drawable/ic_game"
+            android:title="@string/menu_mini_game" />
     </group>
 
     <item android:title="@string/menu_more">

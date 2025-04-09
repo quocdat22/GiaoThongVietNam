@@ -82,6 +82,102 @@ public class Quiz implements Serializable {
     }
     
     /**
+     * Tạo một bài trắc nghiệm từ danh sách biển báo theo danh mục
+     * @param title Tiêu đề của bài
+     * @param description Mô tả
+     * @param signs Danh sách tất cả biển báo
+     * @param category Danh mục biển báo (ví dụ: "P.", "W.", "I.")
+     * @param categoryName Tên hiển thị của danh mục
+     * @param numberOfQuestions Số lượng câu hỏi mong muốn
+     * @return Bài trắc nghiệm đã tạo hoặc null nếu không có đủ biển báo trong danh mục
+     */
+    public static Quiz createFromCategory(String title, String description,
+                                          List<TrafficSign> signs, String category,
+                                          String categoryName, int numberOfQuestions) {
+        if (signs == null || signs.isEmpty()) {
+            return null;
+        }
+        
+        // Map mã danh mục tới tiền tố ID thực tế
+        String prefix;
+        switch (category) {
+            case "P.": // Biển báo cấm
+                prefix = "bien_bao_cam";
+                break;
+            case "W.": // Biển báo nguy hiểm
+                prefix = "bien_nguy_hiem_va_canh_bao";
+                break;
+            case "I.": // Biển báo chỉ dẫn
+                prefix = "bien_chi_dan";
+                break;
+            case "R.": // Biển báo hiệu lệnh
+                prefix = "bien_hieu_lenh";
+                break;
+            case "S.": // Biển báo phụ
+                prefix = "bien_phu";
+                break;
+            default:
+                return null; // Trả về null nếu danh mục không hợp lệ
+        }
+        
+        // Lọc các biển báo thuộc danh mục
+        List<TrafficSign> categorySigns = new ArrayList<>();
+        for (TrafficSign sign : signs) {
+            if (sign.getId().startsWith(prefix)) {
+                categorySigns.add(sign);
+            }
+        }
+        
+        // Nếu không có đủ biển báo thuộc danh mục
+        if (categorySigns.size() < 4) { // Cần ít nhất 4 biển để tạo câu hỏi với 3 đáp án nhiễu
+            return null;
+        }
+        
+        // Giới hạn số lượng câu hỏi nếu nhiều hơn số biển báo có sẵn
+        int quizSize = Math.min(numberOfQuestions, categorySigns.size());
+        
+        // Tạo ID duy nhất dựa trên thời gian và danh mục
+        String quizId = "quiz_" + category + "_" + System.currentTimeMillis();
+        
+        // Tên mô tả cho bài trắc nghiệm
+        String quizTitle = title + " - " + categoryName;
+        
+        Quiz quiz = new Quiz(quizId, quizTitle, description);
+        
+        // Trộn danh sách biển báo để lấy ngẫu nhiên
+        List<TrafficSign> shuffledSigns = new ArrayList<>(categorySigns);
+        Collections.shuffle(shuffledSigns);
+        
+        // Lấy danh sách tên tất cả các biển báo thuộc danh mục để làm đáp án nhiễu
+        List<String> allCategorySignNames = new ArrayList<>();
+        for (TrafficSign sign : categorySigns) {
+            allCategorySignNames.add(sign.getName());
+        }
+        
+        // Tạo các câu hỏi từ biển báo
+        for (int i = 0; i < quizSize; i++) {
+            TrafficSign sign = shuffledSigns.get(i);
+            QuizQuestion question = QuizQuestion.fromTrafficSign(sign);
+            
+            // Thêm các đáp án giả từ danh sách biển báo cùng danh mục
+            question.addFakeOptions(allCategorySignNames);
+            
+            quiz.addQuestion(question);
+        }
+        
+        return quiz;
+    }
+    
+    /**
+     * Tạo một bài trắc nghiệm từ danh sách biển báo theo danh mục với kích thước mặc định (10 câu)
+     */
+    public static Quiz createFromCategory(String title, String description,
+                                          List<TrafficSign> signs, String category,
+                                          String categoryName) {
+        return createFromCategory(title, description, signs, category, categoryName, DEFAULT_QUIZ_SIZE);
+    }
+    
+    /**
      * Thêm câu hỏi vào bài trắc nghiệm
      * @param question Câu hỏi cần thêm
      */

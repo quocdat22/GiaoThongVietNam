@@ -24,6 +24,9 @@ public class SharedPreferencesManager {
     private static final String KEY_PINNED_TRAFFIC_SIGNS = "pinned_traffic_signs";
     private static final String KEY_PINNED_TRAFFIC_SIGNS_DETAILS = "pinned_traffic_signs_details";
     private static final String KEY_DARK_MODE = "dark_mode";
+    private static final String KEY_DAILY_REMINDER_ENABLED = "daily_reminder_enabled";
+    private static final String KEY_REMINDER_HOUR = "reminder_hour";
+    private static final String KEY_REMINDER_MINUTE = "reminder_minute";
     
     private final SharedPreferences sharedPreferences;
     private final Gson gson;
@@ -199,5 +202,51 @@ public class SharedPreferencesManager {
      */
     public boolean isDarkMode() {
         return sharedPreferences.getBoolean(KEY_DARK_MODE, false);
+    }
+
+    /**
+     * Lưu trạng thái bật/tắt nhắc nhở học hàng ngày
+     * @param isEnabled true nếu đã bật, false nếu đã tắt
+     */
+    public void setDailyReminderEnabled(boolean isEnabled) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(KEY_DAILY_REMINDER_ENABLED, isEnabled);
+        editor.apply();
+    }
+    
+    /**
+     * Lấy trạng thái bật/tắt nhắc nhở học hàng ngày
+     * @return true nếu đã bật, false nếu đã tắt
+     */
+    public boolean isDailyReminderEnabled() {
+        return sharedPreferences.getBoolean(KEY_DAILY_REMINDER_ENABLED, false);
+    }
+    
+    /**
+     * Lưu thời gian nhắc nhở hàng ngày
+     * @param hour Giờ (0-23)
+     * @param minute Phút (0-59)
+     */
+    public void setReminderTime(int hour, int minute) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(KEY_REMINDER_HOUR, hour);
+        editor.putInt(KEY_REMINDER_MINUTE, minute);
+        editor.apply();
+    }
+    
+    /**
+     * Lấy giờ nhắc nhở
+     * @return Giờ nhắc nhở (0-23), mặc định là 20 (8 giờ tối)
+     */
+    public int getReminderHour() {
+        return sharedPreferences.getInt(KEY_REMINDER_HOUR, 20);
+    }
+    
+    /**
+     * Lấy phút nhắc nhở
+     * @return Phút nhắc nhở (0-59), mặc định là 0
+     */
+    public int getReminderMinute() {
+        return sharedPreferences.getInt(KEY_REMINDER_MINUTE, 0);
     }
 } 

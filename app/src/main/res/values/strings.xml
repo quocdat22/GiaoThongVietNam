@@ -148,6 +148,28 @@
     <string name="dark_mode_on">Đã bật chế độ tối</string>
     <string name="dark_mode_off">Đã tắt chế độ tối</string>
     <string name="close">Đóng</string>
+    
+    <!-- Daily reminder strings -->
+    <string name="daily_reminder">Nhắc nhở học tập</string>
+    <string name="daily_reminder_toggle">Nhắc nhở học tập mỗi ngày</string>
+    <string name="reminder_time">Thời gian nhắc nhở:</string>
+    <string name="reminder_enabled">Đã bật nhắc nhở học tập</string>
+    <string name="reminder_disabled">Đã tắt nhắc nhở học tập</string>
+    <string name="reminder_time_set">Đã đặt thời gian nhắc nhở</string>
+    <string name="reminder_title">Đã đến giờ học biển báo!</string>
+    <string name="reminder_message">Hãy dành vài phút để ôn tập biển báo hoặc làm bài kiểm tra.</string>
+    <string name="notification_permission_required">Cần quyền thông báo để hiển thị nhắc nhở học tập</string>
+    <string name="alarm_permission_required_title">Cần cấp quyền</string>
+    <string name="alarm_permission_required_message">Ứng dụng cần quyền thiết lập báo thức chính xác để hiển thị nhắc nhở học tập hàng ngày. Hãy cấp quyền này trong phần cài đặt.</string>
+    <string name="go_to_settings">Đi đến Cài đặt</string>
+    <string name="later">Để sau</string>
+    <string name="reminder_setup_error">Không thể thiết lập thông báo chính xác. Thông báo có thể không hiển thị đúng thời gian.</string>
+    <string name="test_notification">Kiểm tra thông báo ngay</string>
+    <string name="test_notification_sent">Đã hiển thị thông báo kiểm tra. Kiểm tra thông báo trên thiết bị của bạn.</string>
+    <string name="test_notification_failed">Không thể hiển thị thông báo. Kiểm tra quyền thông báo trong cài đặt thiết bị.</string>
+    <string name="notification_permission_title">Cần quyền thông báo</string>
+    <string name="notification_permission_message">Vui lòng cấp quyền thông báo để hiển thị nhắc nhở học tập.</string>
+    <string name="grant_permission">Cấp quyền</string>
 
     <!-- Quiz strings -->
     <string name="quiz_title">Trắc nghiệm biển báo giao thông</string>
@@ -182,4 +204,32 @@
     <string name="delete">Xóa</string>
     <string name="confirm_delete">Xác nhận xóa</string>
     <string name="confirm_delete_flashcard">Bạn có chắc chắn muốn xóa thẻ ghi nhớ này?</string>
+
+    <!-- Strings for category quiz -->
+    <string name="select_category">Chọn danh mục biển báo</string>
+    <string name="start_quiz">Bắt đầu</string>
+    <string name="quiz_category_description">Bài trắc nghiệm về danh mục %s</string>
+    <string name="signs_count">%d biển báo</string>
+    <string name="not_enough_signs">Không đủ biển báo trong danh mục này</string>
+    <string name="category_quiz_title">Quiz Biển Báo</string>
+    <string name="traffic_signs_not_available">Dữ liệu biển báo chưa sẵn sàng</string>
+    <string name="delete_quiz">Xóa</string>
+    <string name="quiz_deleted">Đã xóa bài trắc nghiệm</string>
+    <string name="undo">Hoàn tác</string>
+    
+    <!-- Mini Game strings -->
+    <string name="menu_mini_game">Mini Game</string>
+    <string name="mini_game_title">Mini Game Vui Học</string>
+    <string name="mini_game_description">Kéo thả biển báo vào mô tả tương ứng để kiểm tra kiến thức của bạn</string>
+    <string name="mini_game_instruction">Kéo mỗi biển báo bên trái ghép với mô tả phù hợp bên phải</string>
+    <string name="mini_game_drag_here">Kéo biển báo vào đây</string>
+    <string name="mini_game_correct">Chính xác!</string>
+    <string name="mini_game_wrong">Chưa đúng!</string>
+    <string name="mini_game_check">Kiểm tra</string>
+    <string name="mini_game_next">Tiếp theo</string>
+    <string name="mini_game_reset">Làm lại</string>
+    <string name="mini_game_result">Kết quả: %1$d/%2$d</string>
+    <string name="mini_game_complete">Hoàn thành!</string>
+    <string name="mini_game_perfect">Tuyệt vời! Bạn đã hoàn thành chính xác.</string>
+    <string name="mini_game_good">Tốt lắm! Hãy cố gắng làm đúng tất cả.</string>
 </resources>

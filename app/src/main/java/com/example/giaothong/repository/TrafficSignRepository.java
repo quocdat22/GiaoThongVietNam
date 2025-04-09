@@ -465,5 +465,87 @@ public class TrafficSignRepository {
         return offlineDataManager;
     }
     
-    // ... rest of the code ...
+    /**
+     * Lấy danh sách biển báo theo danh mục
+     * @param category Danh mục biển báo cần lọc (ví dụ: "P.", "W.", "I.")
+     * @return Danh sách các biển báo thuộc danh mục
+     */
+    public List<TrafficSign> getTrafficSignsByCategory(String category) {
+        if (trafficSigns == null || trafficSigns.isEmpty()) {
+            return new ArrayList<>();
+        }
+        
+        List<TrafficSign> filteredSigns = new ArrayList<>();
+        
+        // Map mã danh mục tới tiền tố ID thực tế
+        String prefix;
+        switch (category) {
+            case "P.": // Biển báo cấm
+                prefix = "bien_bao_cam";
+                break;
+            case "W.": // Biển báo nguy hiểm
+                prefix = "bien_nguy_hiem_va_canh_bao";
+                break;
+            case "I.": // Biển báo chỉ dẫn
+                prefix = "bien_chi_dan";
+                break;
+            case "R.": // Biển báo hiệu lệnh
+                prefix = "bien_hieu_lenh";
+                break;
+            case "S.": // Biển báo phụ
+                prefix = "bien_phu";
+                break;
+            default:
+                return filteredSigns; // Trả về danh sách rỗng nếu danh mục không hợp lệ
+        }
+        
+        // Lọc theo tiền tố thực tế
+        for (TrafficSign sign : trafficSigns) {
+            if (sign.getId().startsWith(prefix)) {
+                filteredSigns.add(sign);
+            }
+        }
+        
+        Log.d(TAG, "Lọc biển báo theo danh mục " + category + " (prefix=" + prefix + "): tìm thấy " 
+            + filteredSigns.size() + " biển báo");
+        
+        return filteredSigns;
+    }
+    
+    /**
+     * Lấy danh sách các danh mục biển báo có sẵn
+     * @return Danh sách các danh mục biển báo
+     */
+    public List<String> getAvailableCategories() {
+        List<String> categories = new ArrayList<>();
+        categories.add("P."); // Biển báo cấm
+        categories.add("W."); // Biển báo nguy hiểm
+        categories.add("I."); // Biển báo chỉ dẫn
+        categories.add("R."); // Biển báo hiệu lệnh
+        categories.add("S."); // Biển báo phụ
+        
+        return categories;
+    }
+    
+    /**
+     * Lấy tên hiển thị cho danh mục biển báo
+     * @param categoryCode Mã danh mục
+     * @return Tên hiển thị của danh mục
+     */
+    public String getCategoryDisplayName(String categoryCode) {
+        switch (categoryCode) {
+            case "P.":
+                return "Biển báo cấm";
+            case "W.":
+                return "Biển báo nguy hiểm";
+            case "I.":
+                return "Biển báo chỉ dẫn";
+            case "R.":
+                return "Biển báo hiệu lệnh";
+            case "S.":
+                return "Biển báo phụ";
+            default:
+                return "Danh mục khác";
+        }
+    }
 } 
