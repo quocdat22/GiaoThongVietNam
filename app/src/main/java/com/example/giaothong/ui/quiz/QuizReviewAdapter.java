@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.giaothong.R;
 import com.example.giaothong.model.QuizQuestion;
 
@@ -82,13 +84,18 @@ public class QuizReviewAdapter extends RecyclerView.Adapter<QuizReviewAdapter.Qu
             // Set question text
             textQuestion.setText(question.getQuestion());
             
+            // Create RequestOptions for consistent image loading
+            RequestOptions requestOptions = new RequestOptions()
+                .placeholder(R.drawable.ic_image_placeholder)
+                .error(R.drawable.ic_image_error)
+                .fitCenter()
+                .override(600, 600)
+                .diskCacheStrategy(DiskCacheStrategy.ALL);
+            
             // Load question image
             Glide.with(itemView.getContext())
                     .load(question.getImageUrl())
-                    .placeholder(R.drawable.ic_image_placeholder)
-                    .error(R.drawable.ic_image_error)
-                    .fitCenter()
-                    .override(600, 600)
+                    .apply(requestOptions)
                     .into(imageQuestion);
             
             // Lấy thông tin đáp án

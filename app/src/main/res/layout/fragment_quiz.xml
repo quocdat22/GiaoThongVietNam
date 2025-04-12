@@ -40,6 +40,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:textColor="@android:color/white"
+                app:backgroundTint="@color/primary"
                 android:text="@string/quiz_start_random" />
 
             <Button
@@ -47,6 +49,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:textColor="@android:color/white"
+                app:backgroundTint="@color/primary"
                 android:text="@string/quiz_start_category" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>

@@ -20,6 +20,10 @@
     <color name="colorMandatory">#2196F3</color>
     <color name="colorGuide">#4CAF50</color>
     
+    <!-- New app colors -->
+    <color name="primary">#1E88E5</color>
+    <color name="secondary">#4CAF50</color>
+    
     <!-- Màu sắc cho các loại biển báo mới -->
     <color name="colorCam">#D32F2F</color>
     <color name="colorNguyHiem">#FFC107</color>
@@ -30,4 +34,30 @@
     <!-- Màu cho tính năng ghim -->
     <color name="colorPinnedBackground">#FFEBEE</color>
     <color name="colorPinIcon">#F44336</color>
+    
+    <!-- Gray Colors -->
+    <color name="gray_50">#FAFAFA</color>
+    <color name="gray_100">#F5F5F5</color>
+    <color name="gray_200">#EEEEEE</color>
+    <color name="gray_300">#E0E0E0</color>
+    <color name="gray_400">#BDBDBD</color>
+    <color name="gray_500">#9E9E9E</color>
+    <color name="gray_600">#757575</color>
+    <color name="gray_700">#616161</color>
+    <color name="gray_800">#424242</color>
+    <color name="gray_900">#212121</color>
+    
+    <!-- Background Colors -->
+    <color name="bg_blue_light">#E3F2FD</color>
+    <color name="bg_orange_light">#FFF3E0</color>
+    <color name="bg_green_light">#E8F5E9</color>
+    <color name="bg_red_light">#FFEBEE</color>
+    
+    <!-- Status Bar and Navigation -->
+    <color name="status_bar">#1976D2</color>
+    <color name="nav_bar">#FFFFFF</color>
+    
+    <!-- Quiz colors -->
+    <color name="correct_answer">#4CAF50</color>
+    <color name="incorrect_answer">#F44336</color>
 </resources>

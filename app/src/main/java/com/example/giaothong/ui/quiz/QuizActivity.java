@@ -1,6 +1,7 @@
 package com.example.giaothong.ui.quiz;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +17,7 @@ import androidx.preference.PreferenceManager;
 
 import com.bumptech.glide.Glide;
 import com.example.giaothong.R;
+import com.example.giaothong.data.DailyProgressManager;
 import com.example.giaothong.data.QuizHistoryManager;
 import com.example.giaothong.model.Quiz;
 import com.example.giaothong.model.QuizQuestion;
@@ -29,6 +31,7 @@ public class QuizActivity extends AppCompatActivity {
 
     private Quiz quiz;
     private QuizHistoryManager historyManager;
+    private DailyProgressManager progressManager;
 
     private TextView textQuestionNumber;
     private ProgressBar progressBar;
@@ -61,7 +64,9 @@ public class QuizActivity extends AppCompatActivity {
         }
 
         // Khởi tạo history manager
-        historyManager = new QuizHistoryManager(PreferenceManager.getDefaultSharedPreferences(this));
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        historyManager = new QuizHistoryManager(prefs);
+        progressManager = new DailyProgressManager(prefs);
 
         // Khởi tạo views
         initViews();
@@ -106,21 +111,39 @@ public class QuizActivity extends AppCompatActivity {
         // Sự kiện khi chọn đáp án
         radioGroupListener = (group, checkedId) -> {
             if (!answerSelected) {
-                answerSelected = true;
-                
-                // Xác định RadioButton được chọn
-                int selectedIndex = -1;
+                // Lưu câu trả lời
+                int selectedAnswerIndex = -1;
                 for (int i = 0; i < radioAnswers.length; i++) {
                     if (radioAnswers[i].getId() == checkedId) {
-                        selectedIndex = i;
+                        selectedAnswerIndex = i;
                         break;
                     }
                 }
-                
-                if (selectedIndex != -1) {
-                    // Kiểm tra đáp án
-                    boolean isCorrect = quiz.checkAnswer(selectedIndex);
-                    showFeedback(isCorrect);
+
+                if (selectedAnswerIndex != -1) {
+                    // Kiểm tra câu trả lời
+                    QuizQuestion currentQuestion = quiz.getCurrentQuestion();
+                    boolean isCorrect = quiz.checkAnswer(selectedAnswerIndex);
+                    
+                    // Track the learned traffic sign and accuracy
+                    String signId = currentQuestion.getTrafficSignId();
+                    progressManager.trackLearnedSign(signId, isCorrect);
+                    
+                    // Display feedback
+                    if (isCorrect) {
+                        textFeedback.setText(getString(R.string.answer_correct));
+                        textFeedback.setTextColor(getResources().getColor(R.color.correct_answer, null));
+                    } else {
+                        textFeedback.setText(getString(R.string.answer_incorrect));
+                        textFeedback.setTextColor(getResources().getColor(R.color.incorrect_answer, null));
+                    }
+                    textFeedback.setVisibility(View.VISIBLE);
+
+                    // Đánh dấu đã chọn câu trả lời
+                    answerSelected = true;
+
+                    // Enable Next button
+                    btnNext.setEnabled(true);
                 }
             }
         };

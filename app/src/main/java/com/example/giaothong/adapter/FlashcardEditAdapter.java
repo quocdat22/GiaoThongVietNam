@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.giaothong.R;
 import com.example.giaothong.model.Flashcard;
 
@@ -103,11 +105,18 @@ public class FlashcardEditAdapter extends RecyclerView.Adapter<FlashcardEditAdap
             // Hiển thị hình ảnh nếu có
             if (flashcard.getImageUrl() != null && !flashcard.getImageUrl().isEmpty()) {
                 imageFlashcard.setVisibility(View.VISIBLE);
+                
+                // Create RequestOptions for consistent image loading
+                RequestOptions requestOptions = new RequestOptions()
+                    .placeholder(R.drawable.ic_image_placeholder)
+                    .error(R.drawable.ic_image_error)
+                    .fitCenter()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL);
+                
                 Glide.with(context)
-                        .load(flashcard.getImageUrl())
-                        .placeholder(R.drawable.ic_image_placeholder)
-                        .error(R.drawable.ic_image_error)
-                        .into(imageFlashcard);
+                    .load(flashcard.getImageUrl())
+                    .apply(requestOptions)
+                    .into(imageFlashcard);
             } else {
                 imageFlashcard.setVisibility(View.GONE);
             }

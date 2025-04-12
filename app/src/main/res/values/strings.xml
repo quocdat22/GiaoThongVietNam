@@ -38,7 +38,7 @@
     <string name="error_loading_data">Lỗi khi tải dữ liệu</string>
     
     <!-- New strings for Navigation Drawer and Flashcards -->
-    <string name="nav_header_desc">Navigation header</string>
+    <string name="nav_header_desc">Phần đầu điều hướng</string>
     <string name="nav_header_subtitle">Hỗ trợ học các biển báo giao thông</string>
     <string name="menu_search">Tìm kiếm</string>
     <string name="menu_flashcards">Thẻ ghi nhớ</string>
@@ -104,8 +104,8 @@
     <string name="card_count_setting">%d thẻ</string>
     <string name="random_card_order">Hiển thị thẻ theo thứ tự ngẫu nhiên</string>
     <string name="create">Tạo mới</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_maps">MapsActivity</string>
+    <string name="hello_blank_fragment">Fragment trống</string>
+    <string name="title_activity_maps">Bản đồ</string>
     
     <!-- Strings cho tính năng Flashcard tùy chỉnh -->
     <string name="create_custom_deck">Tạo bộ thẻ tùy chỉnh</string>
@@ -140,6 +140,9 @@
     <string name="offline_data_management">Quản lý dữ liệu ngoại tuyến</string>
     <string name="confirm_title">Xác nhận</string>
     <string name="confirm_clear_offline_data">Bạn có chắc chắn muốn xóa tất cả dữ liệu ngoại tuyến?</string>
+    <string name="offline_mode_enabled">Chế độ ngoại tuyến đã bật</string>
+    <string name="offline_mode_disabled">Chế độ ngoại tuyến đã tắt</string>
+    <string name="offline_download_failed">Tải dữ liệu thất bại</string>
     
     <!-- Settings strings -->
     <string name="toggle_dark_mode">Chế độ tối</string>
@@ -232,4 +235,24 @@
     <string name="mini_game_complete">Hoàn thành!</string>
     <string name="mini_game_perfect">Tuyệt vời! Bạn đã hoàn thành chính xác.</string>
     <string name="mini_game_good">Tốt lắm! Hãy cố gắng làm đúng tất cả.</string>
+
+    <!-- Study Toggle -->
+    <string name="tab_flashcards">Thẻ ghi nhớ</string>
+    <string name="tab_quiz">Trắc nghiệm</string>
+    
+    <!-- Notification strings -->
+    <string name="notification_icon_description">Thông báo</string>
+    <string name="notification_title">Thông báo</string>
+    <string name="notifications">Thông báo</string>
+    <string name="no_notifications">Không có thông báo</string>
+    <string name="notification_study_reminder_title">Đến giờ học rồi</string>
+    <string name="notification_study_reminder_text">Dành vài phút để ôn tập biển báo và kiểm tra kiến thức của bạn</string>
+    <string name="notification_daily_practice">Nhắc nhở luyện tập hàng ngày</string>
+    <string name="notification_quiz_reminder">Có bài kiểm tra mới</string>
+    <string name="notification_clear_all">Xóa tất cả</string>
+    <string name="notification_settings">Cài đặt thông báo</string>
+
+    <!-- Quiz Activity -->
+    <string name="answer_correct">Đúng!</string>
+    <string name="answer_incorrect">Sai!</string>
 </resources>

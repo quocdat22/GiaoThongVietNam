@@ -126,9 +126,25 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         
         public CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
-            textCategoryName = itemView.findViewById(R.id.text_category_name);
-            textCategoryCount = itemView.findViewById(R.id.text_category_count);
-            cardView = (MaterialCardView) itemView;
+            textCategoryName = itemView.findViewById(R.id.textViewCategoryName);
+            
+            // Create a dummy TextView for the count
+            textCategoryCount = new TextView(itemView.getContext());
+            textCategoryCount.setVisibility(View.GONE);
+            
+            // Check if the itemView is already a MaterialCardView
+            if (itemView instanceof MaterialCardView) {
+                cardView = (MaterialCardView) itemView;
+            } else {
+                // Try to find a card view in the layout
+                View cardViewParent = itemView.findViewById(R.id.cardViewCategory);
+                if (cardViewParent instanceof MaterialCardView) {
+                    cardView = (MaterialCardView) cardViewParent;
+                } else {
+                    // Create a dummy card view
+                    cardView = new MaterialCardView(itemView.getContext());
+                }
+            }
         }
     }
 } 

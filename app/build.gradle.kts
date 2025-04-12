@@ -4,16 +4,19 @@ plugins {
 
 android {
     namespace = "com.example.giaothong"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.giaothong"
-        minSdk = 28
-        targetSdk = 35
+        minSdk = 24
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Add API key to BuildConfig
+        buildConfigField("String", "ROBOFLOW_API_KEY", project.property("ROBOFLOW_API_KEY").toString())
     }
 
     buildTypes {
@@ -32,6 +35,10 @@ android {
 
     lint {
         abortOnError = false
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 }
 

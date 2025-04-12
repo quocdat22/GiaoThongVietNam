@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.giaothong.R;
 import com.example.giaothong.model.Flashcard;
 
@@ -243,14 +245,19 @@ public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardAdapter.Flas
                 try {
                     String imageUrl = flashcard.getImageUrl();
                     
+                    // Add RequestOptions for consistent image loading
+                    RequestOptions requestOptions = new RequestOptions()
+                        .placeholder(R.drawable.ic_image_placeholder)
+                        .error(R.drawable.ic_image_error)
+                        .fitCenter()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL);
+                    
                     // Xử lý các kiểu đường dẫn hình ảnh khác nhau
                     if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
                         // URL đầy đủ từ API
                         Glide.with(context)
                             .load(imageUrl)
-                            .placeholder(R.drawable.ic_image_placeholder)
-                            .error(R.drawable.ic_image_error)
-                            .fitCenter()
+                            .apply(requestOptions)
                             .into(imageFlashcard);
                     } else if (imageUrl.startsWith("bien_bao/")) {
                         // Hình ảnh từ assets "bien_bao/pxxx.png"
@@ -263,26 +270,20 @@ public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardAdapter.Flas
                         if (resourceId != 0) {
                             Glide.with(context)
                                 .load(resourceId)
-                                .placeholder(R.drawable.ic_image_placeholder)
-                                .error(R.drawable.ic_image_error)
-                                .fitCenter()
+                                .apply(requestOptions)
                                 .into(imageFlashcard);
                         } else {
                             // Thử tải từ assets
                             Glide.with(context)
                                 .load("file:///android_asset/" + imageUrl)
-                                .placeholder(R.drawable.ic_image_placeholder)
-                                .error(R.drawable.ic_image_error)
-                                .fitCenter()
+                                .apply(requestOptions)
                                 .into(imageFlashcard);
                         }
                     } else {
                         // Thử tải ảnh trực tiếp từ đường dẫn
                         Glide.with(context)
                             .load(imageUrl)
-                            .placeholder(R.drawable.ic_image_placeholder)
-                            .error(R.drawable.ic_image_error)
-                            .fitCenter()
+                            .apply(requestOptions)
                             .into(imageFlashcard);
                     }
                 } catch (Exception e) {

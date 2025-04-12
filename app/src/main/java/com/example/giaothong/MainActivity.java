@@ -4,59 +4,42 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.GravityCompat;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.giaothong.notification.ReminderManager;
 import com.example.giaothong.repository.TrafficSignRepository;
-import com.example.giaothong.ui.FlashcardsFragment;
-import com.example.giaothong.ui.MiniGameFragment;
-import com.example.giaothong.ui.SearchFragment;
-import com.example.giaothong.ui.fragments.SettingsFragment;
-import com.example.giaothong.ui.quiz.QuizFragment;
 import com.example.giaothong.utils.OfflineImageManager;
-import com.example.giaothong.utils.SearchHistoryManager;
 import com.example.giaothong.utils.SharedPreferencesManager;
 import com.example.giaothong.utils.ThemeUtils;
-import com.example.giaothong.viewmodel.TrafficSignViewModel;
-import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import android.Manifest;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
+    private NavController navController;
     private Toolbar toolbar;
     private SharedPreferencesManager prefsManager;
-    private MenuItem darkModeItem;
-    private Fragment currentFragment;
     private TrafficSignRepository trafficSignRepository;
     private OfflineImageManager offlineImageManager;
+    private ReminderManager reminderManager;
+    private AppBarConfiguration appBarConfiguration;
     
     // Đăng ký launcher để xin cấp quyền thông báo
-    private final ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+    private final androidx.activity.result.ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
                     // Quyền được cấp, thiết lập thông báo nhắc nhở nếu đã bật
                     setupReminderIfEnabled();
@@ -78,42 +61,55 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ThemeUtils.applyThemeFromPreferences(prefsManager);
         
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         
         // Khởi tạo Toolbar
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         
-        // Khởi tạo DrawerLayout và NavigationView
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        // Thiết lập Bottom Navigation
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation);
         
-        // Thiết lập ActionBarDrawerToggle
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-            this, drawerLayout, toolbar,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        );
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
+        // Thiết lập Navigation Controller với nav_graph
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.nav_host_fragment);
+        navController = navHostFragment.getNavController();
         
-        // Set up edge-to-edge display
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.fragment_container), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+        // Thiết lập các màn hình cấp cao nhất (không hiển thị nút Up)
+        appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_home, 
+                R.id.navigation_study, 
+                R.id.navigation_search, 
+                R.id.navigation_profile
+        ).build();
+        
+        // Kết nối NavigationUI với AppBar và BottomNavigationView
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(bottomNavigationView, navController);
+        
+        // Xử lý navigation với bottom nav đặc biệt để sửa lỗi quay về Home
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            // Sử dụng navigate thay vì setupWithNavController
+            int itemId = item.getItemId();
+            if (itemId == R.id.navigation_home) {
+                navController.navigate(R.id.navigation_home);
+                return true;
+            } else if (itemId == R.id.navigation_study) {
+                navController.navigate(R.id.navigation_study);
+                return true;
+            } else if (itemId == R.id.navigation_search) {
+                Bundle emptyArgs = new Bundle(); // Truyền bundle rỗng để tránh dùng lại arguments cũ
+                navController.navigate(R.id.navigation_search, emptyArgs);
+                return true;
+            } else if (itemId == R.id.navigation_profile) {
+                navController.navigate(R.id.navigation_profile);
+                return true;
+            }
+            return false;
         });
         
         // Khởi tạo TrafficSignRepository và bắt đầu tải dữ liệu
         initializeDataManagers();
-        
-        // Mặc định hiển thị màn hình tìm kiếm khi khởi động
-        if (savedInstanceState == null) {
-            showSearchScreen();
-            navigationView.setCheckedItem(R.id.nav_search);
-        }
         
         // Kiểm tra quyền thông báo
         checkNotificationPermission();
@@ -145,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     private void setupReminderIfEnabled() {
         if (prefsManager.isDailyReminderEnabled()) {
-            ReminderManager reminderManager = new ReminderManager(this);
+            reminderManager = new ReminderManager(this);
             
             // Trên Android 12+, kiểm tra quyền SCHEDULE_EXACT_ALARM
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !reminderManager.canScheduleExactAlarms()) {
@@ -200,197 +196,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Thread.currentThread().interrupt();
             }
             
-            // Tải trước tất cả hình ảnh
+            // Tải trước tất cả hình ảnh biển báo
             trafficSignRepository.preloadAllImages();
+            
+            Log.d(TAG, "Hoàn tất tiến trình tải trước dữ liệu trong nền");
         }).start();
     }
-    
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        // Ẩn menu item hiển thị biển báo đã ghim vì giờ đã dùng chip
-        MenuItem pinnedItem = menu.findItem(R.id.action_show_pinned);
-        if (pinnedItem != null) {
-            pinnedItem.setVisible(false);
-        }
-        
-        // Thiết lập trạng thái ban đầu cho nút chuyển đổi chế độ tối
-        darkModeItem = menu.findItem(R.id.action_toggle_dark_mode);
-        if (darkModeItem != null) {
-            darkModeItem.setChecked(prefsManager.isDarkMode());
-        }
-        
-        return true;
-    }
-    
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        
-        if (id == R.id.action_clear_pins) {
-            clearAllPins();
-            return true;
-        } else if (id == R.id.action_clear_history) {
-            clearSearchHistory();
-            return true;
-        } else if (id == R.id.action_toggle_dark_mode) {
-            toggleDarkMode(item);
-            return true;
-        } else if (id == R.id.action_settings) {
-            showSettingsScreen();
-            return true;
-        }
-        
-        return super.onOptionsItemSelected(item);
-    }
-    
-    /**
-     * Xóa tất cả biển báo đã ghim
-     */
-    private void clearAllPins() {
-        if (currentFragment instanceof SearchFragment) {
-            // Chuyển yêu cầu đến SearchFragment
-            TrafficSignViewModel viewModel = new ViewModelProvider(this).get(TrafficSignViewModel.class);
-            viewModel.clearAllPins();
-            Toast.makeText(this, R.string.all_pins_cleared, Toast.LENGTH_SHORT).show();
-        }
-    }
-    
-    /**
-     * Xóa lịch sử tìm kiếm
-     */
-    private void clearSearchHistory() {
-        SearchHistoryManager searchHistoryManager = new SearchHistoryManager(this);
-        searchHistoryManager.clearSearchHistory();
-        Toast.makeText(this, R.string.history_cleared, Toast.LENGTH_SHORT).show();
-    }
-    
-    /**
-     * Chuyển đổi chế độ tối/sáng
-     */
-    private void toggleDarkMode(MenuItem item) {
-        boolean isDarkMode = ThemeUtils.toggleDarkMode(this, prefsManager);
-        item.setChecked(isDarkMode);
-        Toast.makeText(
-                this, 
-                isDarkMode ? R.string.dark_mode_on : R.string.dark_mode_off,
-                Toast.LENGTH_SHORT
-        ).show();
-    }
-    
-    /**
-     * Xử lý sự kiện khi người dùng chọn item trong navigation drawer
-     */
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        
-        if (id == R.id.nav_search) {
-            showSearchScreen();
-        } else if (id == R.id.nav_flashcards) {
-            showFlashcardsScreen();
-        } else if (id == R.id.nav_quiz) {
-            showQuizScreen();
-        } else if (id == R.id.nav_mini_game) {
-            showMiniGameScreen();
-        } else if (id == R.id.nav_settings) {
-            showSettingsScreen();
-        } else if (id == R.id.nav_about) {
-            showAboutDialog();
-        }
-        
-        drawerLayout.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    /**
-     * Hiển thị màn hình tìm kiếm
-     */
-    private void showSearchScreen() {
-        setTitle(getString(R.string.menu_search));
-        Fragment fragment = SearchFragment.newInstance();
-        switchFragment(fragment);
-        navigationView.setCheckedItem(R.id.nav_search);
-    }
-    
-    /**
-     * Hiển thị màn hình flashcards
-     */
-    private void showFlashcardsScreen() {
-        setTitle(getString(R.string.menu_flashcards));
-        Fragment fragment = FlashcardsFragment.newInstance();
-        switchFragment(fragment);
-        navigationView.setCheckedItem(R.id.nav_flashcards);
-    }
-    
-    /**
-     * Hiển thị màn hình cài đặt
-     */
-    private void showSettingsScreen() {
-        setTitle(getString(R.string.menu_settings));
-        Fragment fragment = com.example.giaothong.ui.fragments.SettingsFragment.newInstance();
-        switchFragment(fragment);
-        navigationView.setCheckedItem(R.id.nav_settings);
-    }
-    
-    /**
-     * Hiển thị màn hình trắc nghiệm
-     */
-    private void showQuizScreen() {
-        setTitle(getString(R.string.menu_quiz));
-        Fragment fragment = new QuizFragment();
-        switchFragment(fragment);
-        navigationView.setCheckedItem(R.id.nav_quiz);
-    }
-    
-    /**
-     * Hiển thị màn hình mini game
-     */
-    private void showMiniGameScreen() {
-        setTitle(getString(R.string.menu_mini_game));
-        Fragment fragment = MiniGameFragment.newInstance();
-        switchFragment(fragment);
-        navigationView.setCheckedItem(R.id.nav_mini_game);
-    }
-    
-    /**
-     * Hiển thị dialog thông tin ứng dụng
-     */
-    private void showAboutDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.menu_about)
-               .setMessage("Ứng dụng Biển báo Giao thông\nPhiên bản 1.0\n\nPhát triển bởi:\nNguyễn Văn A\n\n© 2023 Bản quyền")
-               .setIcon(R.drawable.ic_info)
-               .setPositiveButton(R.string.close, (dialog, which) -> dialog.dismiss());
-        
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-    
-    /**
-     * Chuyển đổi giữa các fragment
-     */
-    private void switchFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .commit();
-        currentFragment = fragment;
-    }
 
     @Override
-    public void onBackPressed() {
-        // Xử lý nút back, đóng drawer nếu đang mở
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START);
-        } 
-        // Nếu đang ở màn hình khác màn hình tìm kiếm, quay về màn hình tìm kiếm
-        else if (!(currentFragment instanceof SearchFragment)) {
-            showSearchScreen();
-        } 
-        // Nếu đang ở màn hình tìm kiếm, thoát ứng dụng
-        else {
-            super.onBackPressed();
-        }
+    public boolean onSupportNavigateUp() {
+        return NavigationUI.navigateUp(navController, appBarConfiguration) || super.onSupportNavigateUp();
     }
 }

@@ -18,4 +18,16 @@
         <item name="android:textColor">@color/chip_text_color</item>
         <item name="rippleColor">@color/colorPrimary</item>
     </style>
+
+    <!-- Style for toggle buttons -->
+    <style name="Widget.App.Button.Toggle" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textColor">@color/toggle_text_color</item>
+        <item name="backgroundTint">@color/toggle_background_color</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="materialThemeOverlay">@null</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="cornerRadius">20dp</item>
+    </style>
 </resources> 

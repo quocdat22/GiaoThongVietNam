@@ -14,7 +14,7 @@
         android:layout_marginEnd="16dp"
         app:cardCornerRadius="8dp"
         app:cardElevation="2dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/cardCameraDetection"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -29,6 +29,109 @@
             app:queryHint="@string/search_traffic_signs" />
     </androidx.cardview.widget.CardView>
 
+    <!-- Nút nhận diện biển báo qua camera -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardCameraDetection"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/cardSearch"
+        app:layout_constraintBottom_toBottomOf="@+id/cardSearch">
+
+        <ImageButton
+            android:id="@+id/buttonCameraDetection"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Nhận diện biển báo bằng hình ảnh"
+            android:padding="8dp"
+            android:src="@drawable/ic_camera"
+            app:tint="@color/primary" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- Card hiển thị kết quả nhận diện biển báo -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardDetectionResult"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardSearch">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/textDetectionTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Kết quả nhận diện"
+                android:textColor="@color/gray_800"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/imageDetectionResult"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="8dp"
+                android:contentDescription="Hình ảnh biển báo được nhận diện"
+                android:scaleType="fitCenter"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textDetectionTitle" />
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/progressIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:visibility="gone"
+                app:indicatorColor="@color/primary"
+                app:layout_constraintBottom_toBottomOf="@id/imageDetectionResult"
+                app:layout_constraintEnd_toEndOf="@id/imageDetectionResult"
+                app:layout_constraintStart_toStartOf="@id/imageDetectionResult"
+                app:layout_constraintTop_toTopOf="@id/imageDetectionResult" />
+
+            <TextView
+                android:id="@+id/textDetectionInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Nhấn vào biểu tượng camera để nhận diện biển báo"
+                android:textColor="@color/gray_600"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/imageDetectionResult" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonCloseDetection"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Đóng"
+                android:textColor="@color/primary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textDetectionInfo" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
     <HorizontalScrollView
         android:id="@+id/scrollViewChips"
         android:layout_width="match_parent"
@@ -38,7 +141,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:scrollbars="none"
-        app:layout_constraintTop_toBottomOf="@id/cardSearch">
+        app:layout_constraintTop_toBottomOf="@id/cardDetectionResult">
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chipGroupCategories"

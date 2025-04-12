@@ -153,4 +153,12 @@ public class QuizQuestion implements Serializable {
         // Trộn lại các phương án
         shuffleOptions();
     }
+
+    /**
+     * Add a method to get the traffic sign ID associated with this question
+     */
+    public String getTrafficSignId() {
+        // Simply return the ID field since we already have it
+        return id;
+    }
 } 

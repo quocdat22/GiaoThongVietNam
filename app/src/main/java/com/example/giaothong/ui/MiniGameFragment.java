@@ -21,6 +21,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.giaothong.R;
 import com.example.giaothong.model.TrafficSign;
 import com.example.giaothong.repository.TrafficSignRepository;
@@ -245,51 +247,30 @@ public class MiniGameFragment extends Fragment {
             imageView.getLayoutParams().width = dpToPx(110);
             imageView.getLayoutParams().height = dpToPx(110);
             
+            // Create RequestOptions for consistent image loading
+            RequestOptions requestOptions = new RequestOptions()
+                .placeholder(R.drawable.ic_image_placeholder)
+                .error(R.drawable.ic_image_error)
+                .fitCenter()
+                .diskCacheStrategy(DiskCacheStrategy.ALL);
+            
             // Xử lý các kiểu đường dẫn hình ảnh khác nhau
             if (trafficSign.getImageUrl().startsWith("http://") || trafficSign.getImageUrl().startsWith("https://")) {
                 // URL đầy đủ từ API
                 Glide.with(requireContext())
                     .load(trafficSign.getImageUrl())
-                    .placeholder(R.drawable.ic_image_placeholder)
-                    .error(R.drawable.ic_image_error)
-                    .fitCenter()
+                    .apply(requestOptions)
                     .into(imageView);
-            } else if (trafficSign.getImageUrl().startsWith("bien_bao/")) {
-                // Hình ảnh từ assets "bien_bao/pxxx.png"
-                String fileName = trafficSign.getImageUrl().substring(
-                        trafficSign.getImageUrl().lastIndexOf("/") + 1,
-                        trafficSign.getImageUrl().lastIndexOf("."));
-                
-                // Thử tải từ drawable
-                int resourceId = getResources().getIdentifier(
-                        fileName, "drawable", requireContext().getPackageName());
-                
-                if (resourceId != 0) {
-                    Glide.with(requireContext())
-                        .load(resourceId)
-                        .placeholder(R.drawable.ic_image_placeholder)
-                        .error(R.drawable.ic_image_error)
-                        .fitCenter()
-                        .into(imageView);
-                } else {
-                    // Thử tải từ assets
-                    Glide.with(requireContext())
-                        .load("file:///android_asset/" + trafficSign.getImageUrl())
-                        .placeholder(R.drawable.ic_image_placeholder)
-                        .error(R.drawable.ic_image_error)
-                        .fitCenter()
-                        .into(imageView);
-                }
             } else {
-                // Thử tải ảnh trực tiếp từ đường dẫn
+                // Tải từ assets
+                String assetPath = "file:///android_asset/" + trafficSign.getImageUrl();
                 Glide.with(requireContext())
-                    .load(trafficSign.getImageUrl())
-                    .placeholder(R.drawable.ic_image_placeholder)
-                    .error(R.drawable.ic_image_error)
-                    .fitCenter()
+                    .load(assetPath)
+                    .apply(requestOptions)
                     .into(imageView);
             }
         } else {
+            // Hiển thị ảnh mặc định nếu không có
             imageView.setImageResource(R.drawable.ic_image_placeholder);
         }
         

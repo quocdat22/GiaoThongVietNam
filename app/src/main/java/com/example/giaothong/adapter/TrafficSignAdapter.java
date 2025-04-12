@@ -1,6 +1,7 @@
 package com.example.giaothong.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.giaothong.R;
 import com.example.giaothong.model.TrafficSign;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
 
@@ -87,15 +90,17 @@ public class TrafficSignAdapter extends RecyclerView.Adapter<TrafficSignAdapter.
     class TrafficSignViewHolder extends RecyclerView.ViewHolder {
         private final ImageView imageView;
         private final TextView textName;
+        private final TextView textDescription;
         private final CardView cardView;
         private final ImageView pinIndicator;
 
         TrafficSignViewHolder(@NonNull View itemView) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.image_traffic_sign);
-            textName = itemView.findViewById(R.id.text_sign_name);
-            cardView = itemView.findViewById(R.id.card_traffic_sign);
-            pinIndicator = itemView.findViewById(R.id.image_pin_indicator);
+            imageView = itemView.findViewById(R.id.imageViewSign);
+            textName = itemView.findViewById(R.id.textViewSignName);
+            textDescription = itemView.findViewById(R.id.textViewDescription);
+            cardView = itemView.findViewById(R.id.cardViewSignImage);
+            pinIndicator = itemView.findViewById(R.id.imagePinIndicator);
             
             // Set up click listeners
             itemView.setOnClickListener(v -> {
@@ -117,38 +122,73 @@ public class TrafficSignAdapter extends RecyclerView.Adapter<TrafficSignAdapter.
         void bind(TrafficSign trafficSign) {
             textName.setText(trafficSign.getName());
             
-            // Hiển thị trạng thái ghim
-            if (trafficSign.isPinned()) {
-                pinIndicator.setVisibility(View.VISIBLE);
-                cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.colorPinnedBackground));
+            // Set the description text
+            if (trafficSign.getDescription() != null && !trafficSign.getDescription().isEmpty()) {
+                textDescription.setText(trafficSign.getDescription());
+                textDescription.setVisibility(View.VISIBLE);
+                Log.d("TrafficSignAdapter", "Sign " + trafficSign.getId() + " has description: " + trafficSign.getDescription());
             } else {
+                textDescription.setVisibility(View.GONE);
+                Log.d("TrafficSignAdapter", "Sign " + trafficSign.getId() + " has NO description");
+            }
+            
+            // Hiển thị trạng thái ghim với visual distinction
+            if (trafficSign.isPinned()) {
+                // Show pin indicator icon
+                pinIndicator.setVisibility(View.VISIBLE);
+                
+                // Change background color of image card
+                cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.colorPinnedBackground));
+                
+                // Make the title text a different color - use accent color for pinned items
+                textName.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+                
+                // Make the text bold for pinned items
+                textName.setTypeface(textName.getTypeface(), android.graphics.Typeface.BOLD);
+            } else {
+                // Hide pin indicator for unpinned items
                 pinIndicator.setVisibility(View.GONE);
-                cardView.setCardBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                
+                // Reset to default background
+                cardView.setCardBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
+                
+                // Reset text color
+                textName.setTextColor(ContextCompat.getColor(context, R.color.gray_800));
+                
+                // Reset text style
+                textName.setTypeface(textName.getTypeface(), android.graphics.Typeface.NORMAL);
             }
             
             // Tải hình ảnh
             String imagePath = trafficSign.getImagePath();
             if (imagePath != null && !imagePath.isEmpty()) {
+                // Set scaleType to FIT_CENTER to prevent cropping
+                imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                
+                // Prepare RequestOptions for flexible image loading
+                RequestOptions requestOptions = new RequestOptions()
+                        .placeholder(R.drawable.ic_launcher_foreground)
+                        .error(R.drawable.ic_launcher_foreground)
+                        .fitCenter() // Use fitCenter instead of centerCrop to maintain aspect ratio
+                        .diskCacheStrategy(DiskCacheStrategy.ALL); // Cache images for better performance
+                
                 if (imagePath.startsWith("http")) {
                     // Load từ URL
                     Glide.with(context)
                             .load(imagePath)
-                            .apply(new RequestOptions()
-                                    .placeholder(R.drawable.ic_launcher_foreground)
-                                    .error(R.drawable.ic_launcher_foreground))
+                            .apply(requestOptions)
                             .into(imageView);
                 } else {
                     // Load từ assets
                     String assetPath = "file:///android_asset/" + imagePath;
                     Glide.with(context)
                             .load(assetPath)
-                            .apply(new RequestOptions()
-                                    .placeholder(R.drawable.ic_launcher_foreground)
-                                    .error(R.drawable.ic_launcher_foreground))
+                            .apply(requestOptions)
                             .into(imageView);
                 }
             } else {
                 // Hiển thị ảnh mặc định nếu không có ảnh
+                imageView.setScaleType(ImageView.ScaleType.CENTER);
                 imageView.setImageResource(R.drawable.ic_launcher_foreground);
             }
         }
